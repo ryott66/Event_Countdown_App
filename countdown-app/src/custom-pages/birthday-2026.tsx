@@ -16,19 +16,20 @@ interface Props {
   event: Event;
 }
 
-const MIRROR_IMAGES = Array.from({ length: 17 }, (_, i) => `/images/mirror-gallery/mirror${String(i + 1).padStart(2, "0")}.jpeg`);
-const CUTE_IMAGES = Array.from({ length: 27 }, (_, i) => `/images/cute-gallery/cute${String(i + 1).padStart(2, "0")}.jpg`);
+const BASE = import.meta.env.BASE_URL;
+const MIRROR_IMAGES = Array.from({ length: 17 }, (_, i) => `${BASE}images/mirror-gallery/mirror${String(i + 1).padStart(2, "0")}.jpeg`);
+const CUTE_IMAGES = Array.from({ length: 27 }, (_, i) => `${BASE}images/cute-gallery/cute${String(i + 1).padStart(2, "0")}.jpg`);
 const BOOK_IMAGES = [
-  "/images/book-image/first.png",
-  "/images/book-image/book1.png",
-  "/images/book-image/book2.png",
-  "/images/book-image/book3.png",
-  "/images/book-image/book4.png",
-  "/images/book-image/book5.png",
-  "/images/book-image/book6.png",
-  "/images/book-image/book7.png",
-  "/images/book-image/book8.png",
-  "/images/book-image/last.png",
+  `${BASE}images/book-image/first.png`,
+  `${BASE}images/book-image/book1.png`,
+  `${BASE}images/book-image/book2.png`,
+  `${BASE}images/book-image/book3.png`,
+  `${BASE}images/book-image/book4.png`,
+  `${BASE}images/book-image/book5.png`,
+  `${BASE}images/book-image/book6.png`,
+  `${BASE}images/book-image/book7.png`,
+  `${BASE}images/book-image/book8.png`,
+  `${BASE}images/book-image/last.png`,
 ];
 
 function launchConfetti() {
@@ -97,7 +98,7 @@ export default function Birthday2026({ event }: Props) {
     .b26-header-right a { color: #e68ab6; font-size: 2rem; font-weight: bold; opacity: 0.8; text-decoration: none; margin-left: 1rem; }
     #b26-cake { font-size: 4rem; color: #e2a8c4; margin: 0.7rem 0.5rem; transition: transform 0.2s ease, color 0.2s ease; cursor: pointer; }
     #b26-cake.bigcake { color: rgb(252,127,167); transform: scale(1.1); }
-    .b26-main { width: 100%; margin-top: 5rem; background-image: url("/images/background_main.jpg"); background-size: cover; background-repeat: no-repeat; text-align: center; }
+    .b26-main { width: 100%; margin-top: 5rem; background-image: url("${BASE}images/background_main.jpg"); background-size: cover; background-repeat: no-repeat; text-align: center; }
     #b26-first { font-size: 8rem; font-family: 'Dancing Script', sans-serif; letter-spacing: 0.8rem; color: rgb(241,230,238); opacity: 0.9; padding: 3rem 0 8rem; margin: 0; }
     #b26-countdown { padding: 3rem 1rem; font-size: 5rem; font-family: 'Dancing Script', sans-serif; font-weight: bold; background-color: rgba(255,255,255,0.3); color: rgb(200,247,255); opacity: 0.9; letter-spacing: 0.1rem; }
     .b26-cdtime { font-family: sans-serif; font-size: 3rem; }
@@ -112,7 +113,7 @@ export default function Birthday2026({ event }: Props) {
     .b26-gallery-title { font-size: 3rem; font-family: 'Kaushan Script', cursive; color: rgb(167,167,167); }
     .b26-pic-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding: 2rem; }
     .b26-pic-gallery img { height: 20rem; border: 0.25rem solid rgb(128,128,128); border-radius: 1rem; scroll-snap-align: start; object-fit: cover; flex-shrink: 0; }
-    #b26-trip { height: 50rem; background-image: url("/images/background_trip.png"); background-size: cover; background-repeat: no-repeat; }
+    #b26-trip { height: 50rem; background-image: url("${BASE}images/background_trip.png"); background-size: cover; background-repeat: no-repeat; }
     .b26-trip-title { text-align: center; font-family: 'Dancing Script', cursive; font-size: 4.5rem; color: rgb(224,143,81); padding-top: 6rem; margin: 0; }
     .b26-trip-message { text-align: center; font-style: italic; font-family: 'Dancing Script', cursive; margin: 0 8rem; padding: 2rem; line-height: 1.8; color: rgb(255,255,255); font-size: 5rem; animation: b26blink 2s infinite; }
     @keyframes b26blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
