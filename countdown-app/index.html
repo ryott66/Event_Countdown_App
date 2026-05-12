@@ -9,6 +9,25 @@
     <link href="https://fonts.cdnfonts.com/css/happybirthday" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700;1000&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+    <script>
+      // 404.htmlからのリダイレクトを処理してSPAのルーティングを復元する
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        var search = location.search;
+        if (search) {
+          var p = new URLSearchParams(search);
+          var path = p.get('p');
+          if (path) {
+            var newUrl = '/' + path + (p.get('q') ? '?' + p.get('q') : '') + location.hash;
+            history.replaceState(null, null, newUrl);
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
