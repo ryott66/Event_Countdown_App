@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/Event_Countdown_App/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Countdown</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.cdnfonts.com/css/happybirthday" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700;1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet">
+    <script>
+      // 404.htmlからのリダイレクトを処理してSPAのルーティングを復元する
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        var search = location.search;
+        if (search) {
+          var p = new URLSearchParams(search);
+          var path = p.get('p');
+          if (path) {
+            var newUrl = '/' + path + (p.get('q') ? '?' + p.get('q') : '') + location.hash;
+            history.replaceState(null, null, newUrl);
+          }
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/Event_Countdown_App/assets/index-DCPs00FR.js"></script>
+    <link rel="stylesheet" crossorigin href="/Event_Countdown_App/assets/index-BpxA2MOS.css">
+  <link rel="manifest" href="/Event_Countdown_App/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Event_Countdown_App/registerSW.js"></script></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
