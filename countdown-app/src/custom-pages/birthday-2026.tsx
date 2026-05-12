@@ -113,7 +113,7 @@ export default function Birthday2026({ event }: Props) {
     .b26-gallery-title { font-size: 3rem; font-family: 'Kaushan Script', cursive; color: rgb(167,167,167); }
     .b26-pic-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding: 2rem; }
     .b26-pic-gallery img { height: 20rem; border: 0.25rem solid rgb(128,128,128); border-radius: 1rem; scroll-snap-align: start; object-fit: cover; flex-shrink: 0; }
-    #b26-trip { height: 50rem; background-image: url("${BASE}images/background_trip.png"); background-size: cover; background-repeat: no-repeat; }
+    #b26-trip { height: 50rem; background-image: url("${BASE}images/Trip.jpg"); background-size: cover; background-repeat: no-repeat; }
     .b26-trip-title { text-align: center; font-family: 'Dancing Script', cursive; font-size: 4.5rem; color: rgb(224,143,81); padding-top: 6rem; margin: 0; }
     .b26-trip-message { text-align: center; font-style: italic; font-family: 'Dancing Script', cursive; margin: 0 8rem; padding: 2rem; line-height: 1.8; color: rgb(255,255,255); font-size: 5rem; animation: b26blink 2s infinite; }
     @keyframes b26blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
