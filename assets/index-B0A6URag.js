@@ -100,42 +100,193 @@ Content-Type: `+l.contentType+`\r
   position: absolute;
   left: 0;
   top: 0;
-}`),e.PageFlip=class extends class{constructor(){this.events=new Map}on(e,t){return this.events.has(e)?this.events.get(e).push(t):this.events.set(e,[t]),this}off(e){this.events.delete(e)}trigger(e,t,n=null){if(this.events.has(e))for(let r of this.events.get(e))r({data:n,object:t})}}{constructor(e,t){super(),this.isUserTouch=!1,this.isUserMove=!1,this.setting=null,this.pages=null,this.setting=new g().getSettings(t),this.block=e}destroy(){this.ui.destroy(),this.block.remove()}update(){this.render.update(),this.pages.show()}loadFromImages(e){this.ui=new m(this.block,this,this.setting);let t=this.ui.getCanvas();this.render=new d(this,this.setting,t),this.flipController=new l(this.render,this),this.pages=new i(this,this.render,e),this.pages.load(),this.render.start(),this.pages.show(this.setting.startPage),setTimeout(()=>{this.ui.update(),this.trigger(`init`,this,{page:this.setting.startPage,mode:this.render.getOrientation()})},1)}loadFromHTML(e){this.ui=new p(this.block,this,this.setting,e),this.render=new h(this,this.setting,this.ui.getDistElement()),this.flipController=new l(this.render,this),this.pages=new s(this,this.render,this.ui.getDistElement(),e),this.pages.load(),this.render.start(),this.pages.show(this.setting.startPage),setTimeout(()=>{this.ui.update(),this.trigger(`init`,this,{page:this.setting.startPage,mode:this.render.getOrientation()})},1)}updateFromImages(e){let t=this.pages.getCurrentPageIndex();this.pages.destroy(),this.pages=new i(this,this.render,e),this.pages.load(),this.pages.show(t),this.trigger(`update`,this,{page:t,mode:this.render.getOrientation()})}updateFromHtml(e){let t=this.pages.getCurrentPageIndex();this.pages.destroy(),this.pages=new s(this,this.render,this.ui.getDistElement(),e),this.pages.load(),this.ui.updateItems(e),this.render.reload(),this.pages.show(t),this.trigger(`update`,this,{page:t,mode:this.render.getOrientation()})}clear(){this.pages.destroy(),this.ui.clear()}turnToPrevPage(){this.pages.showPrev()}turnToNextPage(){this.pages.showNext()}turnToPage(e){this.pages.show(e)}flipNext(e=`top`){this.flipController.flipNext(e)}flipPrev(e=`top`){this.flipController.flipPrev(e)}flip(e,t=`top`){this.flipController.flipToPage(e,t)}updateState(e){this.trigger(`changeState`,this,e)}updatePageIndex(e){this.trigger(`flip`,this,e)}updateOrientation(e){this.ui.setOrientationStyle(e),this.update(),this.trigger(`changeOrientation`,this,e)}getPageCount(){return this.pages.getPageCount()}getCurrentPageIndex(){return this.pages.getCurrentPageIndex()}getPage(e){return this.pages.getPage(e)}getRender(){return this.render}getFlipController(){return this.flipController}getOrientation(){return this.render.getOrientation()}getBoundsRect(){return this.render.getRect()}getSettings(){return this.setting}getUI(){return this.ui}getState(){return this.flipController.getState()}getPageCollection(){return this.pages}startUserTouch(e){this.mousePosition=e,this.isUserTouch=!0,this.isUserMove=!1}userMove(e,t){this.isUserTouch||t||!this.setting.showPageCorners?this.isUserTouch&&a.GetDistanceBetweenTwoPoint(this.mousePosition,e)>5&&(this.isUserMove=!0,this.flipController.fold(e)):this.flipController.showCorner(e)}userStop(e,t=!1){this.isUserTouch&&(this.isUserTouch=!1,t||(this.isUserMove?this.flipController.stopMove():this.flipController.flip(e)))}},Object.defineProperty(e,`__esModule`,{value:!0})}))}))(),PS=x.forwardRef((e,t)=>{let n=(0,x.useRef)(null),r=(0,x.useRef)([]),i=(0,x.useRef)(),[a,o]=(0,x.useState)([]);(0,x.useImperativeHandle)(t,()=>({pageFlip:()=>i.current}));let s=(0,x.useCallback)(()=>{i.current&&i.current.clear()},[]),c=(0,x.useCallback)(()=>{let e=i.current;e&&(e.off(`flip`),e.off(`changeOrientation`),e.off(`changeState`),e.off(`init`),e.off(`update`))},[]);return(0,x.useEffect)(()=>{if(r.current=[],e.children){let t=x.Children.map(e.children,e=>x.cloneElement(e,{ref:e=>{e&&r.current.push(e)}}));(!e.renderOnlyPageLengthChange||a.length!==t.length)&&(t.length<a.length&&s(),o(t))}},[e.children]),(0,x.useEffect)(()=>{a.length>0&&r.current.length>0&&(c(),n.current&&!i.current&&(i.current=new NS.PageFlip(n.current,e)),i.current.getFlipController()?i.current.updateFromHtml(r.current):i.current.loadFromHTML(r.current),(()=>{let t=i.current;t&&(e.onFlip&&t.on(`flip`,t=>e.onFlip(t)),e.onChangeOrientation&&t.on(`changeOrientation`,t=>e.onChangeOrientation(t)),e.onChangeState&&t.on(`changeState`,t=>e.onChangeState(t)),e.onInit&&t.on(`init`,t=>e.onInit(t)),e.onUpdate&&t.on(`update`,t=>e.onUpdate(t)))})())},[a]),x.createElement(`div`,{ref:n,className:e.className,style:e.style},a)}),FS=x.memo(PS);function IS(e,t,n,r){if(n||!e)return;t(!0),e.classList.add(r),setTimeout(()=>e.classList.remove(r),200);let i=setInterval(()=>{e.classList.add(r),setTimeout(()=>e.classList.remove(r),200)},600);setTimeout(()=>{clearInterval(i),t(!1)},1200)}var LS=`/Event_Countdown_App/`,RS=Array.from({length:17},(e,t)=>`${LS}images/mirror-gallery/mirror${String(t+1).padStart(2,`0`)}.jpeg`),zS=Array.from({length:27},(e,t)=>`${LS}images/cute-gallery/cute${String(t+1).padStart(2,`0`)}.jpg`),BS=[`${LS}images/book-image/first.png`,`${LS}images/book-image/book1.png`,`${LS}images/book-image/book2.png`,`${LS}images/book-image/book3.png`,`${LS}images/book-image/book4.png`,`${LS}images/book-image/book5.png`,`${LS}images/book-image/book6.png`,`${LS}images/book-image/book7.png`,`${LS}images/book-image/book8.png`,`${LS}images/book-image/last.png`];function VS(){MS({particleCount:300,angle:60,spread:100,origin:{x:0,y:.5},colors:[`#ff69b4`,`#ffd700`,`#87cefa`]}),MS({particleCount:300,angle:120,spread:100,origin:{x:1,y:.5},colors:[`#ff69b4`,`#ffd700`,`#87cefa`]}),MS({particleCount:600,angle:90,spread:200,startVelocity:50,origin:{x:.5,y:0},colors:[`#ff69b4`,`#ffffff`,`#ffd700`]})}function HS(e){let[t,n]=(0,x.useState)({days:0,hours:0,minutes:0,seconds:0,isToday:!1}),[r,i]=(0,x.useState)(!1);return(0,x.useEffect)(()=>{let t=setInterval(()=>{let t=new Date,a=new Date(e);if(t.getFullYear()===a.getFullYear()&&t.getMonth()===a.getMonth()&&t.getDate()===a.getDate()){n({days:0,hours:0,minutes:0,seconds:0,isToday:!0}),r||(VS(),i(!0));return}let o=a.getTime()-t.getTime();if(o>0){let e=Math.floor(o/1e3);n({days:Math.floor(e/86400),hours:Math.floor(e%86400/3600),minutes:Math.floor(e%3600/60),seconds:e%60,isToday:!1})}},1e3);return()=>clearInterval(t)},[r,e]),t}function US({event:e}){let t=ft(),{user:n}=hS(),{days:r,hours:i,minutes:a,seconds:o,isToday:s}=HS(e.date),[c,l]=(0,x.useState)(!1),[u,d]=(0,x.useState)(!1),f=(0,x.useRef)(null),p=(0,x.useRef)(null),[m,h]=(0,x.useState)(()=>window.innerWidth);(0,x.useEffect)(()=>{let e=document.getElementById(`root`);if(!e)return;let t=e.style.maxWidth;return e.style.maxWidth=`100%`,()=>{e.style.maxWidth=t}},[]),(0,x.useEffect)(()=>{let e=()=>h(window.innerWidth);return window.addEventListener(`resize`,e),()=>window.removeEventListener(`resize`,e)},[]);let g=m<832,_=g?Math.min(m-32,400):400,v=Math.round(_*1.4);return(0,$.jsxs)(`div`,{className:`b26-body`,children:[(0,$.jsx)(`style`,{children:`
-    html { font-size: clamp(2px, 1.25vw, 16px); }
+}`),e.PageFlip=class extends class{constructor(){this.events=new Map}on(e,t){return this.events.has(e)?this.events.get(e).push(t):this.events.set(e,[t]),this}off(e){this.events.delete(e)}trigger(e,t,n=null){if(this.events.has(e))for(let r of this.events.get(e))r({data:n,object:t})}}{constructor(e,t){super(),this.isUserTouch=!1,this.isUserMove=!1,this.setting=null,this.pages=null,this.setting=new g().getSettings(t),this.block=e}destroy(){this.ui.destroy(),this.block.remove()}update(){this.render.update(),this.pages.show()}loadFromImages(e){this.ui=new m(this.block,this,this.setting);let t=this.ui.getCanvas();this.render=new d(this,this.setting,t),this.flipController=new l(this.render,this),this.pages=new i(this,this.render,e),this.pages.load(),this.render.start(),this.pages.show(this.setting.startPage),setTimeout(()=>{this.ui.update(),this.trigger(`init`,this,{page:this.setting.startPage,mode:this.render.getOrientation()})},1)}loadFromHTML(e){this.ui=new p(this.block,this,this.setting,e),this.render=new h(this,this.setting,this.ui.getDistElement()),this.flipController=new l(this.render,this),this.pages=new s(this,this.render,this.ui.getDistElement(),e),this.pages.load(),this.render.start(),this.pages.show(this.setting.startPage),setTimeout(()=>{this.ui.update(),this.trigger(`init`,this,{page:this.setting.startPage,mode:this.render.getOrientation()})},1)}updateFromImages(e){let t=this.pages.getCurrentPageIndex();this.pages.destroy(),this.pages=new i(this,this.render,e),this.pages.load(),this.pages.show(t),this.trigger(`update`,this,{page:t,mode:this.render.getOrientation()})}updateFromHtml(e){let t=this.pages.getCurrentPageIndex();this.pages.destroy(),this.pages=new s(this,this.render,this.ui.getDistElement(),e),this.pages.load(),this.ui.updateItems(e),this.render.reload(),this.pages.show(t),this.trigger(`update`,this,{page:t,mode:this.render.getOrientation()})}clear(){this.pages.destroy(),this.ui.clear()}turnToPrevPage(){this.pages.showPrev()}turnToNextPage(){this.pages.showNext()}turnToPage(e){this.pages.show(e)}flipNext(e=`top`){this.flipController.flipNext(e)}flipPrev(e=`top`){this.flipController.flipPrev(e)}flip(e,t=`top`){this.flipController.flipToPage(e,t)}updateState(e){this.trigger(`changeState`,this,e)}updatePageIndex(e){this.trigger(`flip`,this,e)}updateOrientation(e){this.ui.setOrientationStyle(e),this.update(),this.trigger(`changeOrientation`,this,e)}getPageCount(){return this.pages.getPageCount()}getCurrentPageIndex(){return this.pages.getCurrentPageIndex()}getPage(e){return this.pages.getPage(e)}getRender(){return this.render}getFlipController(){return this.flipController}getOrientation(){return this.render.getOrientation()}getBoundsRect(){return this.render.getRect()}getSettings(){return this.setting}getUI(){return this.ui}getState(){return this.flipController.getState()}getPageCollection(){return this.pages}startUserTouch(e){this.mousePosition=e,this.isUserTouch=!0,this.isUserMove=!1}userMove(e,t){this.isUserTouch||t||!this.setting.showPageCorners?this.isUserTouch&&a.GetDistanceBetweenTwoPoint(this.mousePosition,e)>5&&(this.isUserMove=!0,this.flipController.fold(e)):this.flipController.showCorner(e)}userStop(e,t=!1){this.isUserTouch&&(this.isUserTouch=!1,t||(this.isUserMove?this.flipController.stopMove():this.flipController.flip(e)))}},Object.defineProperty(e,`__esModule`,{value:!0})}))}))(),PS=x.forwardRef((e,t)=>{let n=(0,x.useRef)(null),r=(0,x.useRef)([]),i=(0,x.useRef)(),[a,o]=(0,x.useState)([]);(0,x.useImperativeHandle)(t,()=>({pageFlip:()=>i.current}));let s=(0,x.useCallback)(()=>{i.current&&i.current.clear()},[]),c=(0,x.useCallback)(()=>{let e=i.current;e&&(e.off(`flip`),e.off(`changeOrientation`),e.off(`changeState`),e.off(`init`),e.off(`update`))},[]);return(0,x.useEffect)(()=>{if(r.current=[],e.children){let t=x.Children.map(e.children,e=>x.cloneElement(e,{ref:e=>{e&&r.current.push(e)}}));(!e.renderOnlyPageLengthChange||a.length!==t.length)&&(t.length<a.length&&s(),o(t))}},[e.children]),(0,x.useEffect)(()=>{a.length>0&&r.current.length>0&&(c(),n.current&&!i.current&&(i.current=new NS.PageFlip(n.current,e)),i.current.getFlipController()?i.current.updateFromHtml(r.current):i.current.loadFromHTML(r.current),(()=>{let t=i.current;t&&(e.onFlip&&t.on(`flip`,t=>e.onFlip(t)),e.onChangeOrientation&&t.on(`changeOrientation`,t=>e.onChangeOrientation(t)),e.onChangeState&&t.on(`changeState`,t=>e.onChangeState(t)),e.onInit&&t.on(`init`,t=>e.onInit(t)),e.onUpdate&&t.on(`update`,t=>e.onUpdate(t)))})())},[a]),x.createElement(`div`,{ref:n,className:e.className,style:e.style},a)}),FS=x.memo(PS);function IS(e,t,n,r){if(n||!e)return;t(!0),e.classList.add(r),setTimeout(()=>e.classList.remove(r),200);let i=setInterval(()=>{e.classList.add(r),setTimeout(()=>e.classList.remove(r),200)},600);setTimeout(()=>{clearInterval(i),t(!1)},1200)}var LS=`/Event_Countdown_App/`,RS=Array.from({length:17},(e,t)=>`${LS}images/mirror-gallery/mirror${String(t+1).padStart(2,`0`)}.jpeg`),zS=Array.from({length:27},(e,t)=>`${LS}images/cute-gallery/cute${String(t+1).padStart(2,`0`)}.jpg`),BS=[`${LS}images/book-image/first.png`,`${LS}images/book-image/book1.png`,`${LS}images/book-image/book2.png`,`${LS}images/book-image/book3.png`,`${LS}images/book-image/book4.png`,`${LS}images/book-image/book5.png`,`${LS}images/book-image/book6.png`,`${LS}images/book-image/book7.png`,`${LS}images/book-image/book8.png`,`${LS}images/book-image/last.png`];function VS(){MS({particleCount:300,angle:60,spread:100,origin:{x:0,y:.5},colors:[`#ff69b4`,`#ffd700`,`#87cefa`]}),MS({particleCount:300,angle:120,spread:100,origin:{x:1,y:.5},colors:[`#ff69b4`,`#ffd700`,`#87cefa`]}),MS({particleCount:600,angle:90,spread:200,startVelocity:50,origin:{x:.5,y:0},colors:[`#ff69b4`,`#ffffff`,`#ffd700`]})}function HS(e){let[t,n]=(0,x.useState)({days:0,hours:0,minutes:0,seconds:0,isToday:!1}),[r,i]=(0,x.useState)(!1);return(0,x.useEffect)(()=>{let t=setInterval(()=>{let t=new Date,a=new Date(e);if(t.getFullYear()===a.getFullYear()&&t.getMonth()===a.getMonth()&&t.getDate()===a.getDate()){n({days:0,hours:0,minutes:0,seconds:0,isToday:!0}),r||(VS(),i(!0));return}let o=a.getTime()-t.getTime();if(o>0){let e=Math.floor(o/1e3);n({days:Math.floor(e/86400),hours:Math.floor(e%86400/3600),minutes:Math.floor(e%3600/60),seconds:e%60,isToday:!1})}},1e3);return()=>clearInterval(t)},[r,e]),t}function US({event:e}){let t=ft(),{user:n}=hS(),{days:r,hours:i,minutes:a,seconds:o,isToday:s}=HS(e.date),[c,l]=(0,x.useState)(!1),[u,d]=(0,x.useState)(!1),f=(0,x.useRef)(null),p=(0,x.useRef)(null),[m,h]=(0,x.useState)(()=>window.innerWidth);(0,x.useEffect)(()=>{let e=document.getElementById(`root`);if(!e)return;let t=e.style.maxWidth;return e.style.maxWidth=`100%`,()=>{e.style.maxWidth=t}},[]),(0,x.useEffect)(()=>{let e=()=>h(window.innerWidth);return window.addEventListener(`resize`,e),()=>window.removeEventListener(`resize`,e)},[]);let g=m<768,_=g?Math.min(m-32,380):400,v=Math.round(_*1.4);return(0,$.jsxs)(`div`,{className:`b26-body`,children:[(0,$.jsx)(`style`,{children:`
+    html { font-size: 16px; }
     .b26-body { background-color: #fff0f5; font-family: sans-serif; margin: 0; overflow-x: hidden; }
-    .b26-header { height: 5rem; width: 100%; background-color: rgba(207,220,231,0.4); position: fixed; top: 0; z-index: 10; display:flex; align-items:center; }
-    .b26-back-btn { font-size: 1.5rem; margin: 0 0.5rem; padding: 0.5rem 1rem; background: none; border: none; color: #e68ab6; cursor: pointer; }
-    .b26-header-btn { font-size: 2rem; font-family: 'Dancing Script', sans-serif; margin: 0.7rem 0.8rem; padding: 0.7rem 2rem; background-color: rgba(229,166,220,0.7); color: #fff; border-radius: 1rem; box-shadow: 0 0.3rem #cbcbcb; border: none; cursor: pointer; text-decoration: none; }
-    .b26-header-btn:active { position: relative; top: 0.3rem; box-shadow: none; }
-    .b26-header-right a { color: #e68ab6; font-size: 2rem; font-weight: bold; opacity: 0.8; text-decoration: none; margin-left: 1rem; }
-    #b26-cake { font-size: 4rem; color: #e2a8c4; margin: 0.7rem 0.5rem; transition: transform 0.2s ease, color 0.2s ease; cursor: pointer; }
-    #b26-cake.bigcake { color: rgb(252,127,167); transform: scale(1.1); }
-    .b26-main { width: 100%; margin-top: 5rem; background-image: url("${LS}images/background_main.jpg"); background-size: cover; background-repeat: no-repeat; text-align: center; }
-    #b26-first { font-size: 8rem; font-family: 'Dancing Script', sans-serif; letter-spacing: 0.8rem; color: rgb(241,230,238); opacity: 0.9; padding: 3rem 0 8rem; margin: 0; }
-    #b26-countdown { padding: 3rem 1rem; font-size: 5rem; font-family: 'Dancing Script', sans-serif; font-weight: bold; background-color: rgba(255,255,255,0.3); color: rgb(200,247,255); opacity: 0.9; letter-spacing: 0.1rem; }
-    .b26-cdtime { font-family: sans-serif; font-size: 3rem; }
-    .b26-birthday-script { font-size: 7rem; font-weight: 1000; color: rgb(200,247,255); }
-    .b26-birthday-num { font-family: 'HappyBirthday'; font-size: 10rem; font-weight: 100; color: rgb(200,247,255); }
-    .b26-book-section { width: 100%; height: auto; min-height: 60rem; background-color: #f9f0d7; text-align: center; display: flex; flex-direction: column; align-items: center; padding-bottom: 5rem; }
+
+    /* === Header === */
+    .b26-header {
+      width: 100%; background-color: rgba(207,220,231,0.85);
+      position: fixed; top: 0; z-index: 10;
+      display: flex; align-items: center; flex-wrap: wrap;
+      padding: 0.4rem 0.6rem; gap: 0.3rem;
+      backdrop-filter: blur(6px);
+    }
+    .b26-back-btn { font-size: 1.2rem; padding: 0.3rem 0.6rem; background: none; border: none; color: #e68ab6; cursor: pointer; }
+    .b26-header-btn {
+      font-size: 1rem; font-family: 'Dancing Script', sans-serif;
+      padding: 0.35rem 0.8rem; background-color: rgba(229,166,220,0.85);
+      color: #fff; border-radius: 0.7rem; border: none; cursor: pointer;
+      text-decoration: none; box-shadow: 0 0.15rem #cbcbcb;
+    }
+    .b26-header-btn:active { transform: translateY(0.15rem); box-shadow: none; }
+    .b26-header-right { display: none; margin-left: auto; }
+    .b26-header-right a { color: #e68ab6; font-size: 1.4rem; font-weight: bold; opacity: 0.85; text-decoration: none; }
+    #b26-cake { font-size: 1.8rem; color: #e2a8c4; cursor: pointer; transition: transform 0.2s ease, color 0.2s ease; margin: 0 0.3rem; }
+    #b26-cake.bigcake { color: rgb(252,127,167); transform: scale(1.15); }
+
+    /* === Main with background === */
+    .b26-main {
+      width: 100%; margin-top: 3.5rem;
+      background-image: url("${LS}images/background_main.jpg");
+      background-size: cover; background-position: center;
+      background-repeat: no-repeat;
+      text-align: center;
+      padding: 1.5rem 0.75rem 2.5rem;
+      min-height: 70vh;
+    }
+    #b26-first {
+      font-size: clamp(2.2rem, 11vw, 5rem);
+      font-family: 'Dancing Script', sans-serif;
+      letter-spacing: 0.2rem;
+      color: rgb(241,230,238); opacity: 0.95;
+      margin: 0; padding: 1rem 0 2rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    #b26-countdown {
+      padding: 1.2rem 0.8rem;
+      font-size: clamp(1.2rem, 5vw, 2.5rem);
+      font-family: 'Dancing Script', sans-serif;
+      font-weight: bold;
+      background-color: rgba(255,255,255,0.35);
+      color: rgb(200,247,255); opacity: 0.95;
+      letter-spacing: 0.05rem;
+      border-radius: 0.75rem;
+      max-width: 95%; margin: 0 auto;
+    }
+    .b26-cdtime { font-family: sans-serif; font-size: clamp(1rem, 4.5vw, 2rem); display: block; margin-top: 0.5rem; }
+    .b26-birthday-script { font-size: clamp(1.8rem, 8vw, 4rem); font-weight: 1000; color: rgb(200,247,255); display: block; }
+    .b26-birthday-num { font-family: 'HappyBirthday'; font-size: clamp(3rem, 14vw, 6rem); color: rgb(200,247,255); display: block; }
+
+    /* === Book section === */
+    .b26-book-section {
+      width: 100%; background-color: #f9f0d7;
+      text-align: center; padding: 2.5rem 0.75rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+    }
+    .b26-booksection-title {
+      font-family: 'Dancing Script', cursive;
+      color: rgba(230,138,182,0.85);
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      margin: 0;
+    }
     .book { margin: 0 auto; }
-    .b26-booksection-title { font-family: 'Dancing Script', cursive; color: rgba(230,138,182,0.8); font-size: 5rem; padding-top: 8rem; padding-bottom: 3rem; margin: 0; }
-    .b26-memories { padding: 5rem 0 8rem; height: auto; text-align: center; width: 85%; margin: 0 auto; }
-    .b26-memory-title { font-family: 'Dancing Script', cursive; color: rgba(230,138,182,0.8); font-size: 5rem; padding-top: 8rem; padding-bottom: 3rem; margin: 0; }
-    .b26-galleries { background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%); border: 0.7rem solid #c9c9c9; padding: 1rem 1rem 3rem; margin-bottom: 8rem; }
-    .b26-gallery-title { font-size: 3rem; font-family: 'Kaushan Script', cursive; color: rgb(167,167,167); }
-    .b26-pic-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding: 2rem; }
-    .b26-pic-gallery img { height: 20rem; border: 0.25rem solid rgb(128,128,128); border-radius: 1rem; scroll-snap-align: start; object-fit: cover; flex-shrink: 0; }
-    #b26-trip { height: 50rem; background-image: url("${LS}images/Trip.jpg"); background-size: cover; background-repeat: no-repeat; }
-    .b26-trip-title { text-align: center; font-family: 'Dancing Script', cursive; font-size: 4.5rem; color: rgb(224,143,81); padding-top: 6rem; margin: 0; }
-    .b26-trip-message { text-align: center; font-style: italic; font-family: 'Dancing Script', cursive; margin: 0 8rem; padding: 2rem; line-height: 1.8; color: rgb(255,255,255); font-size: 5rem; animation: b26blink 2s infinite; }
-    @keyframes b26blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .b26-footer { height: 12rem; padding-top: 3rem; }
-    .b26-footer-left { font-size: 5rem; color: rgb(249,119,156); margin-left: 5rem; float: left; }
-    #b26-heart { transition: transform 0.2s ease, color 0.2s ease; cursor: pointer; }
-    #b26-heart.bigheart { color: rgb(246,73,128); transform: scale(1.1); }
-    .b26-footer-right { font-size: 2.5rem; padding-top: 2rem; padding-left: 5rem; float: left; color: rgb(254,139,181); }
-    .b26-footer-end { font-size: 2rem; font-family: 'Dancing Script', cursive; margin-top: 7rem; margin-right: 3rem; float: right; }
-    .b26-new-memories { padding: 5rem 0 8rem; text-align: center; width: 85%; margin: 0 auto; }
-    .b26-new-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding: 2rem; }
-    .b26-new-gallery img { height: 20rem; border-radius: 1rem; scroll-snap-align: start; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    /* === Memories === */
+    .b26-memories {
+      padding: 2.5rem 0.75rem 1.5rem;
+      text-align: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .b26-memory-title {
+      font-family: 'Dancing Script', cursive;
+      color: rgba(230,138,182,0.85);
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      margin: 0 0 1.5rem;
+    }
+    .b26-galleries {
+      background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
+      border: 0.3rem solid #c9c9c9;
+      padding: 0.8rem 0.4rem 1.2rem;
+      margin-bottom: 2rem;
+      border-radius: 0.4rem;
+    }
+    .b26-gallery-title {
+      font-size: clamp(1.1rem, 4.5vw, 2rem);
+      font-family: 'Kaushan Script', cursive;
+      color: rgb(167,167,167);
+      margin: 0.3rem 0;
+    }
+    .b26-pic-gallery {
+      display: flex; overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 0.6rem; padding: 0.8rem 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .b26-pic-gallery img {
+      height: clamp(8rem, 35vw, 14rem);
+      border: 0.15rem solid rgb(128,128,128);
+      border-radius: 0.5rem;
+      scroll-snap-align: start;
+      object-fit: cover; flex-shrink: 0;
+    }
+
+    /* === Trip === */
+    #b26-trip {
+      width: 100%;
+      background-image: url("${LS}images/Trip.jpg");
+      background-size: cover; background-position: center;
+      background-repeat: no-repeat;
+      padding: 3rem 1rem;
+      min-height: 50vh;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .b26-trip-title {
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.8rem, 7vw, 3.5rem);
+      color: rgb(224,143,81);
+      margin: 0 0 1.5rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .b26-trip-message {
+      text-align: center; font-style: italic;
+      font-family: 'Dancing Script', cursive;
+      padding: 0.5rem 1rem; line-height: 1.5;
+      color: rgb(255,255,255);
+      font-size: clamp(1.3rem, 5.5vw, 2.8rem);
+      animation: b26blink 2s infinite;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+      margin: 0;
+    }
+    @keyframes b26blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    /* === New memories === */
+    .b26-new-memories {
+      padding: 2.5rem 0.75rem;
+      text-align: center;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .b26-new-gallery {
+      display: flex; overflow-x: auto;
+      scroll-snap-type: x mandatory; gap: 0.6rem; padding: 0.8rem 0.4rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .b26-new-gallery img {
+      height: clamp(10rem, 40vw, 16rem);
+      border-radius: 0.75rem; scroll-snap-align: start;
+      object-fit: cover; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* === Footer === */
+    .b26-footer {
+      padding: 1.5rem 1.2rem;
+      display: flex; flex-wrap: wrap;
+      align-items: center; gap: 0.8rem;
+    }
+    .b26-footer-left { font-size: 2.2rem; color: rgb(249,119,156); line-height: 1; }
+    #b26-heart { cursor: pointer; transition: transform 0.2s ease, color 0.2s ease; }
+    #b26-heart.bigheart { color: rgb(246,73,128); transform: scale(1.15); }
+    .b26-footer-right { font-size: 0.95rem; color: rgb(254,139,181); flex: 1; min-width: 10rem; }
+    .b26-footer-end { font-size: 0.95rem; font-family: 'Dancing Script', cursive; margin-left: auto; color: rgb(254,139,181); }
+
+    /* === Tablet/Desktop === */
+    @media (min-width: 768px) {
+      .b26-header { padding: 0.6rem 1.2rem; gap: 0.6rem; }
+      .b26-header-btn { font-size: 1.3rem; padding: 0.5rem 1.2rem; border-radius: 0.9rem; }
+      .b26-header-right { display: block; }
+      .b26-header-right a { font-size: 1.6rem; }
+      #b26-cake { font-size: 2.2rem; }
+      .b26-back-btn { font-size: 1.5rem; }
+      .b26-main { margin-top: 4.5rem; padding: 3rem 2rem; min-height: 75vh; }
+      #b26-trip { padding: 5rem 2rem; min-height: 55vh; }
+      .b26-book-section { padding: 4rem 2rem; gap: 2rem; }
+      .b26-memories, .b26-new-memories { padding: 4rem 2rem; }
+      .b26-galleries { padding: 1.2rem 1rem 2rem; border-width: 0.5rem; }
+      .b26-footer { padding: 2.5rem 3rem; }
+      .b26-footer-left { font-size: 3rem; }
+      .b26-footer-right { font-size: 1.1rem; }
+      .b26-footer-end { font-size: 1.1rem; }
+    }
   `}),(0,$.jsxs)(`header`,{className:`b26-header`,children:[(0,$.jsx)(`button`,{className:`b26-back-btn`,onClick:()=>t(`/`),children:`←`}),n.state===`admin`&&(0,$.jsx)(`button`,{className:`b26-back-btn`,onClick:()=>t(`/events/${e.id}/edit`),children:`Edit`}),(0,$.jsx)(`div`,{children:(0,$.jsx)(`i`,{ref:f,id:`b26-cake`,className:`fa-solid fa-cake-candles`,onClick:()=>IS(f.current,l,c,`bigcake`)})}),(0,$.jsxs)(`nav`,{children:[(0,$.jsx)(`a`,{href:`#b26-countdown`,className:`b26-header-btn`,onClick:e=>{e.preventDefault(),document.getElementById(`b26-countdown`)?.scrollIntoView({behavior:`smooth`})},children:`Countdown`}),(0,$.jsx)(`a`,{href:`#b26-memories`,className:`b26-header-btn`,onClick:e=>{e.preventDefault(),document.getElementById(`b26-memories`)?.scrollIntoView({behavior:`smooth`})},children:`Memories`}),(0,$.jsx)(`a`,{href:`#b26-trip`,className:`b26-header-btn`,onClick:e=>{e.preventDefault(),document.getElementById(`b26-trip`)?.scrollIntoView({behavior:`smooth`})},children:`Date`})]}),(0,$.jsx)(`div`,{className:`b26-header-right`,children:(0,$.jsx)(`a`,{href:`#b26-first`,onClick:e=>{e.preventDefault(),document.getElementById(`b26-first`)?.scrollIntoView({behavior:`smooth`})},children:`Remina's Birthday`})})]}),(0,$.jsxs)(`div`,{className:`b26-main`,children:[(0,$.jsx)(`h1`,{id:`b26-first`,children:`Ryo & Remina`}),(0,$.jsx)(`div`,{id:`b26-countdown`,children:s?(0,$.jsxs)($.Fragment,{children:[`🎉 `,(0,$.jsx)(`span`,{className:`b26-birthday-script`,children:`Happy Birthday`}),` 🎉`,(0,$.jsx)(`br`,{}),(0,$.jsx)(`span`,{className:`b26-birthday-script`,children:`　Remina`}),(0,$.jsx)(`span`,{className:`b26-birthday-num`,children:`23`})]}):(0,$.jsxs)($.Fragment,{children:[`Countdown to Birthday:`,(0,$.jsx)(`br`,{}),(0,$.jsxs)(`span`,{className:`b26-cdtime`,children:[r,` days `,String(i).padStart(2,`0`),`:`,String(a).padStart(2,`0`),`:`,String(o).padStart(2,`0`)]})]})})]}),(0,$.jsxs)(`div`,{className:`b26-book-section`,children:[(0,$.jsx)(`h2`,{className:`b26-booksection-title`,children:`Book`}),(0,$.jsx)(FS,{width:_,height:v,size:`fixed`,minWidth:150,maxWidth:1e3,minHeight:200,maxHeight:1536,maxShadowOpacity:.5,showCover:!0,mobileScrollSupport:!0,startPage:0,drawShadow:!0,flippingTime:1e3,usePortrait:g,startZIndex:0,autoSize:!1,clickEventForward:!0,useMouseEvents:!0,showPageCorners:!0,disableFlipByClick:!1,style:{},className:`book`,children:BS.map((e,t)=>(0,$.jsx)(`div`,{className:`page`,children:(0,$.jsx)(`img`,{src:e,width:_,height:v,alt:``})},t))})]}),(0,$.jsxs)(`div`,{id:`b26-memories`,className:`b26-memories`,children:[(0,$.jsx)(`h2`,{className:`b26-memory-title`,children:`Memories`}),(0,$.jsxs)(`div`,{className:`b26-galleries`,children:[(0,$.jsx)(`p`,{className:`b26-gallery-title`,children:`Mirror Moments`}),(0,$.jsx)(`div`,{className:`b26-pic-gallery`,children:RS.map((e,t)=>(0,$.jsx)(`img`,{src:e,alt:`Mirror ${t+1}`},t))})]}),(0,$.jsxs)(`div`,{className:`b26-galleries`,children:[(0,$.jsx)(`p`,{className:`b26-gallery-title`,children:`Cutest Moments`}),(0,$.jsx)(`div`,{className:`b26-pic-gallery`,children:zS.map((e,t)=>(0,$.jsx)(`img`,{src:e,alt:`Cute ${t+1}`},t))})]})]}),(0,$.jsxs)(`div`,{id:`b26-trip`,children:[(0,$.jsxs)(`h2`,{className:`b26-trip-title`,children:[`Karuizawa`,(0,$.jsx)(`br`,{}),`6/26~6/27`]}),(0,$.jsx)(`div`,{className:`b26-trip-message`,children:(0,$.jsx)(`p`,{children:`Thank you`})})]}),e.imageUrls?.length>0&&(0,$.jsxs)(`div`,{className:`b26-new-memories`,children:[(0,$.jsx)(`h2`,{className:`b26-memory-title`,children:`2026 Memories`}),(0,$.jsx)(`div`,{className:`b26-new-gallery`,children:e.imageUrls.map((e,t)=>(0,$.jsx)(`img`,{src:e,alt:``},t))})]}),(0,$.jsxs)(`footer`,{className:`b26-footer`,children:[(0,$.jsx)(`div`,{className:`b26-footer-left`,children:(0,$.jsx)(`i`,{ref:p,id:`b26-heart`,className:`fa-solid fa-heart`,onClick:()=>IS(p.current,d,u,`bigheart`)})}),(0,$.jsx)(`div`,{className:`b26-footer-right`,children:`大好きなれみちゃん、いつもありがとう😄`}),(0,$.jsx)(`p`,{className:`b26-footer-end`,children:`Created by Ryo`})]})]})}var WS={"birthday-2026":US},GS={birthday:{bg:`linear-gradient(160deg, #fff0f5 0%, #ffe4ef 100%)`,accent:`#e68ab6`,numColor:`rgb(200, 247, 255)`,numBg:`rgba(230, 138, 182, 0.7)`,confettiColors:[`#ff9ec4`,`#ffb3d1`,`#fff0f5`,`#ff69a5`,`#ffd6e7`]},travel:{bg:`linear-gradient(160deg, #e3f6ff 0%, #c8ecff 100%)`,accent:`#4fc3f7`,numColor:`rgb(200, 247, 255)`,numBg:`rgba(79, 195, 247, 0.6)`,confettiColors:[`#4fc3f7`,`#81d4fa`,`#b3e5fc`,`#29b6f6`,`#e3f6ff`]},anniversary:{bg:`linear-gradient(160deg, #fce4ec 0%, #f8bbd9 100%)`,accent:`#8b1a4a`,numColor:`rgb(255, 220, 235)`,numBg:`rgba(139, 26, 74, 0.6)`,confettiColors:[`#8b1a4a`,`#c2185b`,`#f06292`,`#fce4ec`,`#ff80ab`]},date:{bg:`linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%)`,accent:`#ff8a50`,numColor:`rgb(255, 245, 220)`,numBg:`rgba(255, 138, 80, 0.6)`,confettiColors:[`#ff8a50`,`#ffb74d`,`#ffd54f`,`#fff3e0`,`#ffcc02`]}};function KS(e){let[t,n]=(0,x.useState)({days:0,hours:0,minutes:0,seconds:0,isToday:!1,isPast:!1});return(0,x.useEffect)(()=>{let t=()=>{let t=new Date,r=new Date(e);r.setHours(0,0,0,0);let i=new Date(t);i.setHours(0,0,0,0);let a=r.getTime()-t.getTime(),o=r.getTime()===i.getTime(),s=r.getTime()<i.getTime();if(o||s){n({days:0,hours:0,minutes:0,seconds:0,isToday:o,isPast:s});return}n({days:Math.floor(a/(1e3*60*60*24)),hours:Math.floor(a%(1e3*60*60*24)/(1e3*60*60)),minutes:Math.floor(a%(1e3*60*60)/(1e3*60)),seconds:Math.floor(a%(1e3*60)/1e3),isToday:!1,isPast:!1})};t();let r=setInterval(t,1e3);return()=>clearInterval(r)},[e]),t}function qS({value:e,label:t,color:n,bg:r,accent:i}){return(0,$.jsxs)(`div`,{style:{textAlign:`center`},children:[(0,$.jsx)(`div`,{style:{background:r,borderRadius:`16px`,padding:`0.75rem 1rem`,minWidth:`4.5rem`,backdropFilter:`blur(4px)`},children:(0,$.jsx)(`div`,{style:{color:n,fontFamily:`"Dancing Script", cursive`,fontSize:`clamp(2rem, 8vw, 3rem)`,lineHeight:1},children:String(e).padStart(2,`0`)})}),(0,$.jsx)(`div`,{style:{color:i,opacity:.7,fontSize:`0.75rem`,marginTop:`0.4rem`},children:t})]})}function JS({event:e}){let t=ft(),{user:n}=hS(),r=GS[e.theme]??GS.birthday,{days:i,hours:a,minutes:o,seconds:s,isToday:c,isPast:l}=KS(e.date);return(0,x.useEffect)(()=>{if(!c)return;let e=()=>MS({particleCount:80,spread:70,colors:r.confettiColors,origin:{y:.6}});e();let t=setInterval(e,3e3);return()=>clearInterval(t)},[c]),(0,$.jsxs)(`div`,{style:{minHeight:`100svh`,background:r.bg},children:[(0,$.jsxs)(`div`,{style:{padding:`1.25rem 1.5rem`,display:`flex`,justifyContent:`space-between`,alignItems:`center`},children:[(0,$.jsx)(`button`,{onClick:()=>t(`/`),style:{background:`none`,fontSize:`1.3rem`,color:r.accent},children:`←`}),n.state===`admin`&&(0,$.jsx)(`button`,{onClick:()=>t(`/events/${e.id}/edit`),style:{background:`none`,color:r.accent,fontSize:`0.9rem`,border:`1.5px solid ${r.accent}`,borderRadius:`20px`,padding:`0.3rem 0.9rem`},children:`編集`})]}),(0,$.jsxs)(`div`,{style:{padding:`1rem 1.5rem 3rem`,textAlign:`center`},children:[(0,$.jsx)(`div`,{style:{fontSize:`4rem`,marginBottom:`0.5rem`},children:e.emoji}),(0,$.jsx)(`h1`,{style:{color:r.accent,fontSize:`clamp(1.8rem, 6vw, 2.4rem)`,marginBottom:`0.5rem`},children:e.title}),(0,$.jsx)(`p`,{style:{color:r.accent,opacity:.7,marginBottom:`2.5rem`,fontSize:`0.95rem`},children:e.date}),c?(0,$.jsx)(`div`,{style:{margin:`2rem 0`},children:(0,$.jsx)(`div`,{style:{fontFamily:`"Dancing Script", cursive`,fontSize:`clamp(2.5rem, 10vw, 4rem)`,color:r.accent},children:`🎉 Happy Day! 🎉`})}):l?(0,$.jsx)(`p`,{style:{color:r.accent,opacity:.6,fontSize:`1.1rem`},children:`素敵な思い出になりました ✨`}):(0,$.jsxs)(`div`,{style:{display:`flex`,gap:`0.75rem`,justifyContent:`center`,flexWrap:`wrap`,marginBottom:`2rem`},children:[(0,$.jsx)(qS,{value:i,label:`days`,color:r.numColor,bg:r.numBg,accent:r.accent}),(0,$.jsx)(qS,{value:a,label:`hours`,color:r.numColor,bg:r.numBg,accent:r.accent}),(0,$.jsx)(qS,{value:o,label:`min`,color:r.numColor,bg:r.numBg,accent:r.accent}),(0,$.jsx)(qS,{value:s,label:`sec`,color:r.numColor,bg:r.numBg,accent:r.accent})]}),e.memo&&(0,$.jsx)(`div`,{style:{background:`rgba(255,255,255,0.6)`,borderRadius:`16px`,padding:`1rem 1.25rem`,margin:`1.5rem 0`,backdropFilter:`blur(4px)`,textAlign:`left`,color:`var(--text)`,lineHeight:1.7,whiteSpace:`pre-wrap`},children:e.memo}),e.imageUrls?.length>0&&(0,$.jsx)(`div`,{style:{display:`flex`,gap:`0.75rem`,overflowX:`auto`,marginTop:`1.5rem`,paddingBottom:`0.5rem`,scrollSnapType:`x mandatory`},children:e.imageUrls.map((e,t)=>(0,$.jsx)(`img`,{src:e,alt:``,style:{width:`min(75vw, 300px)`,height:`min(75vw, 300px)`,objectFit:`cover`,borderRadius:`16px`,flexShrink:0,scrollSnapAlign:`start`,boxShadow:`0 4px 16px rgba(0,0,0,0.1)`}},t))})]})]})}function YS(){let{id:e}=mt(),{event:t,loading:n}=xS(e);if(n)return(0,$.jsx)(`p`,{style:{padding:`2rem`},children:`読み込み中...`});if(!t)return(0,$.jsx)(`p`,{style:{padding:`2rem`},children:`イベントが見つかりません`});if(t.useCustomPage&&t.customPageKey){let e=WS[t.customPageKey];if(e)return(0,$.jsx)(e,{event:t})}return(0,$.jsx)(JS,{event:t})}function XS(){let{user:e}=hS();return e.state===`loading`?(0,$.jsx)(`div`,{style:{padding:`2rem`,fontFamily:`sans-serif`},children:`読み込み中...`}):e.state===`unauthorized`?(0,$.jsx)(gS,{}):(0,$.jsxs)(Bt,{children:[(0,$.jsx)(zt,{path:`/`,element:(0,$.jsx)(bS,{})}),(0,$.jsx)(zt,{path:`/events/:id`,element:(0,$.jsx)(YS,{})}),(0,$.jsx)(zt,{path:`/events/new`,element:(0,$.jsx)(AS,{})}),(0,$.jsx)(zt,{path:`/events/:id/edit`,element:(0,$.jsx)(AS,{})}),(0,$.jsx)(zt,{path:`*`,element:(0,$.jsx)(Rt,{to:`/`})})]})}(0,Yn.createRoot)(document.getElementById(`root`)).render((0,$.jsx)(x.StrictMode,{children:(0,$.jsx)(On,{children:(0,$.jsx)(mS,{children:(0,$.jsx)(XS,{})})})}));
