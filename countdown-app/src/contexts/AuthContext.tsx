@@ -24,7 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        setUser({ state: "admin", uid: firebaseUser.uid, email: firebaseUser.email ?? undefined });
+        const allowedAdmins = (import.meta.env.VITE_ADMIN_UIDS ?? "")
+          .split(",").map((e: string) => e.trim()).filter(Boolean);
+        if (allowedAdmins.includes(firebaseUser.uid)) {
+          setUser({ state: "admin", uid: firebaseUser.uid, email: firebaseUser.email ?? undefined });
+        } else {
+          await signOut(auth);
+          setUser({ state: "unauthorized" });
+        }
         return;
       }
 
