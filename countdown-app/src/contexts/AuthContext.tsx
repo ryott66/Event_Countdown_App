@@ -30,10 +30,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Googleログインなし → ゲストキーを確認
       if (urlKey) {
-        const snap = await getDoc(doc(db, "config", "guestKey"));
-        if (snap.exists() && snap.data().key === urlKey) {
-          setUser({ state: "guest" });
-          return;
+        try {
+          const snap = await getDoc(doc(db, "config", "guestKey"));
+          if (snap.exists() && snap.data().key === urlKey) {
+            setUser({ state: "guest" });
+            return;
+          }
+        } catch (e) {
+          console.error("guestKey read failed:", e);
         }
       }
 
