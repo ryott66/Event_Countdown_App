@@ -1,6 +1,6 @@
 import {
   collection, addDoc, updateDoc, deleteDoc,
-  doc, serverTimestamp, setDoc, arrayUnion,
+  doc, serverTimestamp, setDoc, arrayUnion, arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "./firebase";
@@ -58,6 +58,10 @@ export async function addToGallery(gallery: "mirror" | "cute", urls: string[]): 
 
 export async function removeFromGallery(gallery: "mirror" | "cute", url: string): Promise<void> {
   const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
-  const { arrayRemove } = await import("firebase/firestore");
   await setDoc(doc(db, "config", "galleries"), { [field]: arrayRemove(url) }, { merge: true });
+}
+
+export async function updateGalleryOrder(gallery: "mirror" | "cute", urls: string[]): Promise<void> {
+  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
+  await setDoc(doc(db, "config", "galleries"), { [field]: urls }, { merge: true });
 }
