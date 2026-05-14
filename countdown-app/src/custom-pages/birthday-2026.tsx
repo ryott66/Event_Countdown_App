@@ -95,7 +95,7 @@ export default function Birthday2026({ event }: Props) {
   }, []);
 
   const isPortrait = winWidth < 768;
-  const bookPageWidth = isPortrait ? Math.min(winWidth - 32, 380) : 400;
+  const bookPageWidth = isPortrait ? Math.min(winWidth - 80, 250) : 400;
   const bookPageHeight = Math.round(bookPageWidth * 1.4);
 
   // PCはReact_pageの設計を忠実に再現、モバイルは@mediaで上書き
