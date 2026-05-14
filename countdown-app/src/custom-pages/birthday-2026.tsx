@@ -17,8 +17,6 @@ interface Props {
 }
 
 const BASE = import.meta.env.BASE_URL;
-const MIRROR_IMAGES = Array.from({ length: 17 }, (_, i) => `${BASE}images/mirror-gallery/mirror${String(i + 1).padStart(2, "0")}.jpeg`);
-const CUTE_IMAGES = Array.from({ length: 27 }, (_, i) => `${BASE}images/cute-gallery/cute${String(i + 1).padStart(2, "0")}.jpg`);
 const BOOK_IMAGES = [
   `${BASE}images/book-image/first.png`,
   `${BASE}images/book-image/book1.png`,
@@ -451,13 +449,13 @@ export default function Birthday2026({ event }: Props) {
         <div className="b26-galleries">
           <p className="b26-gallery-title">Mirror Moments</p>
           <div className="b26-pic-gallery">
-            {MIRROR_IMAGES.map((src, i) => <img key={i} src={src} alt={`Mirror ${i + 1}`} />)}
+            {event.mirrorUrls.map((src: string, i: number) => <img key={i} src={src} alt={`Mirror ${i + 1}`} />)}
           </div>
         </div>
         <div className="b26-galleries">
           <p className="b26-gallery-title">Cutest Moments</p>
           <div className="b26-pic-gallery">
-            {CUTE_IMAGES.map((src, i) => <img key={i} src={src} alt={`Cute ${i + 1}`} />)}
+            {event.cuteUrls.map((src: string, i: number) => <img key={i} src={src} alt={`Cute ${i + 1}`} />)}
           </div>
         </div>
       </div>

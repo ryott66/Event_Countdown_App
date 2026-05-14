@@ -43,6 +43,8 @@ export default function EventFormPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mirrorInputRef = useRef<HTMLInputElement>(null);
+  const cuteInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -50,6 +52,8 @@ export default function EventFormPage() {
   const [theme, setTheme] = useState<"birthday" | "travel" | "anniversary" | "date">("birthday");
   const [memo, setMemo] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [mirrorUrls, setMirrorUrls] = useState<string[]>([]);
+  const [cuteUrls, setCuteUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -62,6 +66,8 @@ export default function EventFormPage() {
       setTheme(event.theme);
       setMemo(event.memo ?? "");
       setImageUrls(event.imageUrls ?? []);
+      setMirrorUrls(event.mirrorUrls ?? []);
+      setCuteUrls(event.cuteUrls ?? []);
     }
   }, [isEdit, loading, event?.id]);
 
@@ -80,12 +86,24 @@ export default function EventFormPage() {
     setUploading(false);
   };
 
+  const handleGalleryUpload = async (files: FileList, folder: string, setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setUploading(true);
+    const tempId = isEdit ? id! : `temp_${Date.now()}`;
+    const urls: string[] = [];
+    for (const file of Array.from(files)) {
+      const url = await uploadImage(file, tempId, folder);
+      urls.push(url);
+    }
+    setter((prev) => [...prev, ...urls]);
+    setUploading(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !date || !emoji) return;
     setSaving(true);
     const input = {
-      title, date, emoji, theme, memo, imageUrls,
+      title, date, emoji, theme, memo, imageUrls, mirrorUrls, cuteUrls,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
       recurring: false,
@@ -211,6 +229,84 @@ export default function EventFormPage() {
                   <button
                     type="button"
                     onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                    style={{
+                      position: "absolute", top: "-6px", right: "-6px",
+                      background: "#e05", color: "#fff", borderRadius: "50%",
+                      width: "20px", height: "20px", fontSize: "12px", lineHeight: "20px",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </FormField>
+
+        <FormField label="Mirror Moments ギャラリー">
+          <input
+            ref={mirrorInputRef} type="file" accept="image/*" multiple
+            style={{ display: "none" }}
+            onChange={(e) => e.target.files && handleGalleryUpload(e.target.files, "mirror", setMirrorUrls)}
+          />
+          <button
+            type="button"
+            onClick={() => mirrorInputRef.current?.click()}
+            style={{
+              width: "100%", padding: "0.75rem", borderRadius: "10px",
+              border: "2px dashed #f0d0e0", background: "#fff",
+              color: "var(--text-light)", fontSize: "0.9rem",
+            }}
+          >
+            {uploading ? "アップロード中..." : "+ Mirror写真を追加"}
+          </button>
+          {mirrorUrls.length > 0 && (
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
+              {mirrorUrls.map((url, i) => (
+                <div key={i} style={{ position: "relative" }}>
+                  <img src={url} alt="" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px" }} />
+                  <button
+                    type="button"
+                    onClick={() => setMirrorUrls((prev) => prev.filter((_, j) => j !== i))}
+                    style={{
+                      position: "absolute", top: "-6px", right: "-6px",
+                      background: "#e05", color: "#fff", borderRadius: "50%",
+                      width: "20px", height: "20px", fontSize: "12px", lineHeight: "20px",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </FormField>
+
+        <FormField label="Cutest Moments ギャラリー">
+          <input
+            ref={cuteInputRef} type="file" accept="image/*" multiple
+            style={{ display: "none" }}
+            onChange={(e) => e.target.files && handleGalleryUpload(e.target.files, "cute", setCuteUrls)}
+          />
+          <button
+            type="button"
+            onClick={() => cuteInputRef.current?.click()}
+            style={{
+              width: "100%", padding: "0.75rem", borderRadius: "10px",
+              border: "2px dashed #f0d0e0", background: "#fff",
+              color: "var(--text-light)", fontSize: "0.9rem",
+            }}
+          >
+            {uploading ? "アップロード中..." : "+ Cute写真を追加"}
+          </button>
+          {cuteUrls.length > 0 && (
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
+              {cuteUrls.map((url, i) => (
+                <div key={i} style={{ position: "relative" }}>
+                  <img src={url} alt="" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px" }} />
+                  <button
+                    type="button"
+                    onClick={() => setCuteUrls((prev) => prev.filter((_, j) => j !== i))}
                     style={{
                       position: "absolute", top: "-6px", right: "-6px",
                       background: "#e05", color: "#fff", borderRadius: "50%",

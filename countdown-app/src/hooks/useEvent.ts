@@ -10,11 +10,15 @@ export function useEvent(id: string) {
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "events", id), (snap) => {
       if (snap.exists()) {
+        const d = snap.data();
         setEvent({
           id: snap.id,
-          ...snap.data(),
-          createdAt: snap.data().createdAt?.toDate() ?? new Date(),
-          updatedAt: snap.data().updatedAt?.toDate() ?? new Date(),
+          ...d,
+          imageUrls: d.imageUrls ?? [],
+          mirrorUrls: d.mirrorUrls ?? [],
+          cuteUrls: d.cuteUrls ?? [],
+          createdAt: d.createdAt?.toDate() ?? new Date(),
+          updatedAt: d.updatedAt?.toDate() ?? new Date(),
         } as Event);
       } else {
         setEvent(null);

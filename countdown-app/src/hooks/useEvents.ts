@@ -14,6 +14,9 @@ export function useEvents() {
       const data = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
+        imageUrls: doc.data().imageUrls ?? [],
+        mirrorUrls: doc.data().mirrorUrls ?? [],
+        cuteUrls: doc.data().cuteUrls ?? [],
         createdAt: doc.data().createdAt?.toDate() ?? new Date(),
         updatedAt: doc.data().updatedAt?.toDate() ?? new Date(),
       })) as Event[];

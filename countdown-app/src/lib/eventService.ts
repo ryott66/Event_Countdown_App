@@ -12,14 +12,19 @@ export interface EventInput {
   theme: "birthday" | "travel" | "anniversary" | "date";
   memo: string;
   imageUrls: string[];
+  mirrorUrls: string[];
+  cuteUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
   recurring: boolean;
   createdBy: string;
 }
 
-export async function uploadImage(file: File, eventId: string): Promise<string> {
-  const storageRef = ref(storage, `events/${eventId}/${Date.now()}_${file.name}`);
+export async function uploadImage(file: File, eventId: string, folder = ""): Promise<string> {
+  const path = folder
+    ? `events/${eventId}/${folder}/${Date.now()}_${file.name}`
+    : `events/${eventId}/${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, path);
   await uploadBytes(storageRef, file);
   return getDownloadURL(storageRef);
 }
