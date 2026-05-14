@@ -264,7 +264,7 @@ Content-Type: `+l.contentType+`\r
 
     /* === Main === */
     .b26-main {
-      height: auto; width: 100%; margin-top: 5rem;
+      height: auto; min-height: 80vh; width: 100%; margin-top: 5rem;
       background-image: url("${aE}images/background_main.jpg");
       background-size: cover; background-position: center;
       background-repeat: no-repeat;
