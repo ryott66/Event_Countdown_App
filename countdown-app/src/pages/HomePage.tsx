@@ -20,34 +20,34 @@ const css = `
 
   /* === Header === */
   .hp-header {
-    height: 5rem; width: 100%;
+    height: 3.8rem; width: 100%;
     background-color: rgba(207,220,231,0.4);
     position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; padding: 0 2rem; gap: 1.5rem;
+    display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem;
     backdrop-filter: blur(8px);
   }
   .hp-logo {
     font-family: "Dancing Script", cursive;
-    font-size: 3rem; color: var(--pink); flex: 1;
+    font-size: 2rem; color: var(--pink); flex: 1;
   }
   .hp-nav-btn {
-    font-size: 2rem; font-family: "Dancing Script", cursive;
-    padding: 0.7rem 2rem;
+    font-size: 1.3rem; font-family: "Dancing Script", cursive;
+    padding: 0.45rem 1.3rem;
     background-color: rgba(229,166,220,0.7); color: #fff;
-    border-radius: 1rem; box-shadow: 0 0.3rem #cbcbcb;
+    border-radius: 0.7rem; box-shadow: 0 0.2rem #cbcbcb;
     border: none; cursor: pointer; white-space: nowrap;
   }
-  .hp-nav-btn:active { position: relative; top: 0.3rem; box-shadow: none; }
+  .hp-nav-btn:active { position: relative; top: 0.2rem; box-shadow: none; }
   .hp-nav-btn:hover { background-color: rgba(229,166,220,0.85); }
   .hp-icon-btn {
     background: var(--pink); color: #fff;
-    border-radius: 50%; width: 3.5rem; height: 3.5rem;
-    font-size: 2rem; line-height: 1; flex-shrink: 0;
+    border-radius: 50%; width: 2.4rem; height: 2.4rem;
+    font-size: 1.3rem; line-height: 1; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0.3rem #cbcbcb; border: none; cursor: pointer;
+    box-shadow: 0 0.2rem #cbcbcb; border: none; cursor: pointer;
   }
   .hp-logout-btn {
-    background: none; color: var(--text-light); font-size: 1.2rem;
+    background: none; color: var(--text-light); font-size: 0.9rem;
     white-space: nowrap; border: none; cursor: pointer;
   }
 
@@ -55,22 +55,22 @@ const css = `
   .hp-section-title {
     font-family: "Dancing Script", cursive;
     color: rgba(230,138,182,0.85);
-    font-size: 5rem;
-    padding-top: 5rem; padding-bottom: 3rem; margin: 0;
+    font-size: 3.3rem;
+    padding-top: 3.5rem; padding-bottom: 2rem; margin: 0;
     text-align: center;
   }
 
   /* === Events === */
   .hp-events {
-    padding: 0 0 5rem; width: 85%; margin: 0 auto;
+    padding: 0 0 4rem; width: 85%; margin: 0 auto;
   }
   .hp-sub-title {
-    font-size: 2rem; color: var(--text-light);
-    margin-bottom: 1rem; margin-top: 2rem;
+    font-size: 1.4rem; color: var(--text-light);
+    margin-bottom: 0.8rem; margin-top: 1.5rem;
     font-family: "Dancing Script", cursive;
   }
   .hp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .hp-events-empty { color: var(--text-light); font-size: 1.5rem; }
+  .hp-events-empty { color: var(--text-light); font-size: 1rem; }
 
   /* === Event Cards === */
   .ec-card {
@@ -131,11 +131,11 @@ const css = `
   }
   .hp-gallery-name {
     font-family: "Kaushan Script", cursive;
-    font-size: 3rem; color: rgb(167,167,167); margin: 0;
+    font-size: 2.2rem; color: rgb(167,167,167); margin: 0;
   }
   .hp-gallery-action-btn {
-    font-size: 1.2rem; padding: 0.5rem 1rem;
-    border-radius: 1rem; border: 1.5px solid var(--pink);
+    font-size: 0.95rem; padding: 0.4rem 0.9rem;
+    border-radius: 0.7rem; border: 1.5px solid var(--pink);
     color: var(--pink); background: rgba(255,255,255,0.6);
     white-space: nowrap; cursor: pointer;
   }
