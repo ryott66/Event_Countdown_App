@@ -147,11 +147,12 @@ export default function Birthday2026({ event }: Props) {
 
     /* === Main === */
     .b26-main {
-      height: auto; width: 100%; margin-top: 5rem;
+      height: auto; min-height: calc(100vh - 5rem); width: 100%; margin-top: 5rem;
       background-image: url("${BASE}images/background_main.jpg");
       background-size: cover; background-position: center;
       background-repeat: no-repeat;
       text-align: center;
+      display: flex; flex-direction: column; justify-content: center;
     }
     #b26-first {
       font-size: 8rem; font-family: 'Dancing Script', sans-serif;
