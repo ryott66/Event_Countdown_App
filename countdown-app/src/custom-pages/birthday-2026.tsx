@@ -115,10 +115,15 @@ export default function Birthday2026({ event }: Props) {
       float: left; margin-left: 0.5rem;
     }
     .b26-edit-btn {
-      font-size: 1.3rem; padding: 0.5rem 0.8rem;
-      background: none; border: none; color: #e68ab6; cursor: pointer;
-      float: left;
+      font-size: 1.6rem; font-family: 'Dancing Script', sans-serif;
+      float: left; margin: 0.7rem 0 0 0.5rem;
+      padding: 0.55rem 1.3rem;
+      background-color: rgba(229,166,220,0.55); color: #fff;
+      border-radius: 0.9rem; box-shadow: 0 0.3rem #cbcbcb;
+      border: none; cursor: pointer;
     }
+    .b26-edit-btn:active { position: relative; top: 0.3rem; box-shadow: none; }
+    .b26-edit-btn:hover { background-color: rgba(229,166,220,0.78); }
     .b26-header-left { float: left; margin: 0 1.5rem; }
     #b26-cake {
       font-size: 4rem; color: #e2a8c4; margin: 0.7rem 0;
@@ -149,7 +154,7 @@ export default function Birthday2026({ event }: Props) {
     .b26-main {
       height: auto; min-height: calc(100vh - 5rem); width: 100%; margin-top: 5rem;
       background-image: url("${BASE}images/background_main.jpg");
-      background-size: cover; background-position: center;
+      background-size: cover; background-position: center 15%;
       background-repeat: no-repeat;
       text-align: center;
       display: flex; flex-direction: column; justify-content: center;
@@ -280,7 +285,7 @@ export default function Birthday2026({ event }: Props) {
       .b26-header-left, .b26-header nav, .b26-header-right { float: none; }
       .b26-header-left { margin: 0 0.4rem; }
       .b26-back-btn { float: none; font-size: 1.2rem; padding: 0.3rem 0.5rem; margin: 0; }
-      .b26-edit-btn { float: none; font-size: 1rem; padding: 0.3rem 0.5rem; margin: 0; }
+      .b26-edit-btn { float: none; font-size: 1rem; padding: 0.3rem 0.7rem; margin: 0.2rem 0.25rem; box-shadow: 0 0.15rem #cbcbcb; }
       .b26-header-btn {
         float: none; font-size: 1rem; padding: 0.35rem 0.8rem;
         margin: 0.2rem 0.25rem; border-radius: 0.6rem;

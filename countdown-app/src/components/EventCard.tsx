@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Event } from "../types";
 
 interface Props {
   event: Event;
   isPast?: boolean;
+  isAdmin?: boolean;
 }
 
 function daysUntil(dateStr: string) {
@@ -17,47 +19,42 @@ function daysUntil(dateStr: string) {
 export default function EventCard({ event, isPast }: Props) {
   const navigate = useNavigate();
   const days = daysUntil(event.date);
+  const [thumbUrl, setThumbUrl] = useState<string>(event.iconUrl ?? "");
+
+  useEffect(() => {
+    setThumbUrl(event.iconUrl ?? "");
+  }, [event.iconUrl]);
 
   return (
     <div
+      className="ec-card"
+      style={{ opacity: isPast ? 0.5 : 1 }}
       onClick={() => navigate(`/events/${event.id}`)}
-      style={{
-        background: "var(--card-bg)",
-        borderRadius: "16px",
-        padding: "1.25rem 1.5rem",
-        boxShadow: "var(--shadow)",
-        cursor: "pointer",
-        opacity: isPast ? 0.5 : 1,
-        display: "flex",
-        alignItems: "center",
-        gap: "1rem",
-        transition: "transform 0.15s",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
     >
-      <span style={{ fontSize: "2.5rem" }}>{event.emoji}</span>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: '"Dancing Script", cursive', fontSize: "1.3rem", color: "var(--text)" }}>
-          {event.title}
-        </div>
-        <div style={{ fontSize: "0.85rem", color: "var(--text-light)", marginTop: "0.25rem" }}>
-          {event.date}
-        </div>
+      <div className="ec-media">
+        {thumbUrl
+          ? <img src={thumbUrl} alt="" className="ec-photo" />
+          : <div className="ec-emoji-bg">{event.emoji}</div>
+        }
       </div>
-      <div style={{ textAlign: "right" }}>
-        {days === 0 ? (
-          <div style={{ color: "var(--pink)", fontFamily: '"Dancing Script", cursive', fontSize: "1.4rem" }}>Today 🎉</div>
-        ) : isPast ? (
-          <div style={{ color: "var(--text-light)", fontSize: "0.9rem" }}>{Math.abs(days)}日前</div>
-        ) : (
-          <>
-            <div style={{ color: "var(--pink)", fontFamily: '"Dancing Script", cursive', fontSize: "2rem", lineHeight: 1 }}>
-              {days}
-            </div>
-            <div style={{ color: "var(--text-light)", fontSize: "0.75rem" }}>days</div>
-          </>
+      <div className="ec-info">
+        <div className="ec-title">{event.title}</div>
+        <div className="ec-date">{event.date}</div>
+        {event.memo && (
+          <div className="ec-memo">{event.memo}</div>
         )}
+        <div className="ec-countdown">
+          {days === 0 ? (
+            <span className="ec-today">Today 🎉</span>
+          ) : isPast ? (
+            <span className="ec-past-days">{Math.abs(days)}日前</span>
+          ) : (
+            <>
+              <div className="ec-days">{days}</div>
+              <div className="ec-days-label">days</div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

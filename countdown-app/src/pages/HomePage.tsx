@@ -69,8 +69,48 @@ const css = `
     margin-bottom: 1rem; margin-top: 2rem;
     font-family: "Dancing Script", cursive;
   }
-  .hp-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .hp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
   .hp-events-empty { color: var(--text-light); font-size: 1.5rem; }
+
+  /* === Event Cards === */
+  .ec-card {
+    background: var(--card-bg); border-radius: 1.2rem;
+    box-shadow: var(--shadow); cursor: pointer; overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .ec-card:hover { transform: translateY(-3px); }
+  .ec-media { width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; }
+  .ec-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ec-emoji-bg {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    font-size: 3.5rem;
+  }
+  .ec-upload-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.28);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; font-size: 2rem;
+    cursor: pointer; pointer-events: none;
+  }
+  .ec-media:hover .ec-upload-overlay { opacity: 1; pointer-events: auto; }
+  .ec-info { padding: 0.8rem 1rem 1rem; }
+  .ec-title {
+    font-family: "Dancing Script", cursive; font-size: 1.3rem; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ec-date { font-size: 0.88rem; color: var(--text-light); margin-top: 0.2rem; }
+  .ec-memo {
+    font-size: 0.82rem; color: var(--text-light); margin-top: 0.3rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    opacity: 0.8;
+  }
+  .ec-countdown { margin-top: 0.4rem; text-align: right; }
+  .ec-days { font-family: "Dancing Script", cursive; font-size: 1.8rem; color: var(--pink); line-height: 1; }
+  .ec-days-label { font-size: 0.7rem; color: var(--text-light); }
+  .ec-today { color: var(--pink); font-family: "Dancing Script", cursive; font-size: 1.2rem; }
+  .ec-past-days { color: var(--text-light); font-size: 0.85rem; }
 
   /* === Memories === */
   .hp-galleries-wrap {
@@ -172,6 +212,11 @@ const css = `
     .hp-edit-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 1rem 0.5rem; }
     .hp-delete-badge { width: 1.6rem; height: 1.6rem; font-size: 1rem; line-height: 1.6rem; }
     .hp-gallery-empty { font-size: 1rem; padding: 1.5rem 0.5rem; }
+    .hp-cards { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+    .ec-title { font-size: 1.05rem; }
+    .ec-days { font-size: 1.4rem; }
+    .ec-info { padding: 0.5rem 0.7rem 0.7rem; }
+    .ec-emoji-bg { font-size: 2.5rem; }
   }
 `;
 
@@ -240,7 +285,9 @@ function GallerySection({
   };
 
   const handleDelete = (url: string) => {
-    setLocalUrls((prev) => prev.filter((u) => u !== url));
+    if (confirm("この写真を削除しますか？")) {
+      setLocalUrls((prev) => prev.filter((u) => u !== url));
+    }
   };
 
   const handleUpload = async (files: FileList) => {
@@ -361,12 +408,12 @@ export default function HomePage() {
                 <p className="hp-sub-title">これから</p>
                 {upcoming.length === 0
                   ? <p className="hp-events-empty">イベントがありません</p>
-                  : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} />)}</div>}
+                  : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} isAdmin={isAdmin} />)}</div>}
               </section>
               {past.length > 0 && (
                 <section>
                   <p className="hp-sub-title">過去</p>
-                  <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast />)}</div>
+                  <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast isAdmin={isAdmin} />)}</div>
                 </section>
               )}
             </>

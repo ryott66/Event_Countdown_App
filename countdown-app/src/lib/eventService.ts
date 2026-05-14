@@ -11,6 +11,7 @@ export interface EventInput {
   emoji: string;
   theme: "birthday" | "travel" | "anniversary" | "date";
   memo: string;
+  iconUrl: string;
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;

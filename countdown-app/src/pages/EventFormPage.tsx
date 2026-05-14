@@ -42,16 +42,20 @@ export default function EventFormPage() {
   const { event, loading } = useEvent(isEdit ? id! : "__skip__");
   const { user } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const iconFileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [emoji, setEmoji] = useState("🎉");
   const [theme, setTheme] = useState<"birthday" | "travel" | "anniversary" | "date">("birthday");
   const [memo, setMemo] = useState("");
+  const [iconUrl, setIconUrl] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [iconUploading, setIconUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [iconHover, setIconHover] = useState(false);
 
   useEffect(() => {
     if (isEdit && !loading && event) {
@@ -60,15 +64,33 @@ export default function EventFormPage() {
       setEmoji(event.emoji);
       setTheme(event.theme);
       setMemo(event.memo ?? "");
+      setIconUrl(event.iconUrl ?? "");
       setImageUrls(event.imageUrls ?? []);
     }
   }, [isEdit, loading, event?.id]);
 
+  useEffect(() => {
+    const root = document.getElementById("root");
+    if (!root) return;
+    const prev = root.style.maxWidth;
+    root.style.maxWidth = "100%";
+    return () => { root.style.maxWidth = prev; };
+  }, []);
+
   if (user.state !== "admin") return null;
   if (isEdit && loading) return <p style={{ padding: "2rem" }}>読み込み中...</p>;
 
-  const handleImageUpload = async (files: FileList) => {
-    setUploading(true);
+  const handleIconUpload = async (files: FileList) => {
+    if (!files[0]) return;
+    setIconUploading(true);
+    const tempId = isEdit ? id! : `temp_${Date.now()}`;
+    const url = await uploadImage(files[0], tempId);
+    setIconUrl(url);
+    setIconUploading(false);
+  };
+
+  const handleGalleryUpload = async (files: FileList) => {
+    setGalleryUploading(true);
     const tempId = isEdit ? id! : `temp_${Date.now()}`;
     const urls: string[] = [];
     for (const file of Array.from(files)) {
@@ -76,15 +98,15 @@ export default function EventFormPage() {
       urls.push(url);
     }
     setImageUrls((prev) => [...prev, ...urls]);
-    setUploading(false);
+    setGalleryUploading(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title || !date || !emoji) return;
     setSaving(true);
     const input = {
-      title, date, emoji, theme, memo, imageUrls,
+      title, date, emoji, theme, memo, iconUrl, imageUrls,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
       recurring: false,
@@ -113,22 +135,20 @@ export default function EventFormPage() {
       <header style={{
         background: "var(--header-bg)",
         padding: "1.25rem 1.5rem",
-        display: "flex",
-        alignItems: "center",
-        gap: "1rem",
-        position: "sticky",
-        top: 0,
-        zIndex: 10,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        position: "sticky", top: 0, zIndex: 10,
+        backdropFilter: "blur(8px)",
       }}>
         <button onClick={() => navigate("/")} style={{ background: "none", fontSize: "1.3rem", color: "var(--text-light)" }}>
           ←
         </button>
-        <h1 style={{ fontSize: "1.6rem", color: "var(--pink)" }}>
+        <h1 style={{ fontSize: "2.5rem", color: "var(--pink)", fontFamily: '"Dancing Script", cursive', fontWeight: 600 }}>
           {isEdit ? "Edit Event" : "New Event"}
         </h1>
+        <div style={{ width: "1.3rem" }} />
       </header>
 
-      <form onSubmit={handleSubmit} style={{ padding: "1.5rem" }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "540px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
         <FormField label="タイトル *">
           <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Reminaの誕生日" />
         </FormField>
@@ -137,23 +157,108 @@ export default function EventFormPage() {
           <input style={inputStyle} type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </FormField>
 
-        <FormField label="絵文字 *">
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
-            {EMOJI_PRESETS.map((e) => (
-              <button
-                key={e} type="button"
-                onClick={() => setEmoji(e)}
+        {/* ===== アイコン ===== */}
+        <FormField label="アイコン *">
+          <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+
+            {/* 左: 写真アップロードエリア */}
+            <div style={{ flexShrink: 0 }}>
+              <input
+                ref={iconFileInputRef} type="file" accept="image/*"
+                style={{ display: "none" }}
+                onChange={(e) => e.target.files?.length && handleIconUpload(e.target.files)}
+              />
+
+              {/* プレビュー正方形 */}
+              <div
+                onClick={() => iconFileInputRef.current?.click()}
+                onMouseEnter={() => setIconHover(true)}
+                onMouseLeave={() => setIconHover(false)}
                 style={{
-                  fontSize: "1.5rem", padding: "0.3rem 0.5rem", borderRadius: "8px",
-                  background: emoji === e ? "var(--pink-light)" : "#fff",
-                  border: emoji === e ? "2px solid var(--pink)" : "2px solid #f0d0e0",
+                  width: "108px", height: "108px", borderRadius: "18px",
+                  overflow: "hidden", cursor: "pointer", position: "relative",
+                  border: iconUrl ? "2px solid #f0d0e0" : "2px dashed #f0d0e0",
+                  background: iconUrl ? undefined : "linear-gradient(135deg, #fce4ec, #f8bbd0)",
+                  display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center",
+                  gap: "0.3rem",
                 }}
               >
-                {e}
-              </button>
-            ))}
+                {iconUrl ? (
+                  <img src={iconUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                ) : (
+                  <>
+                    <span style={{ fontSize: "2.6rem", lineHeight: 1 }}>{emoji}</span>
+                    <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.9)", fontWeight: 600 }}>
+                      写真を追加
+                    </span>
+                  </>
+                )}
+
+                {/* ホバーオーバーレイ */}
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "rgba(0,0,0,0.32)",
+                  display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: "0.25rem",
+                  opacity: iconHover || iconUploading ? 1 : 0,
+                  transition: "opacity 0.2s",
+                }}>
+                  <span style={{ fontSize: "1.6rem", lineHeight: 1 }}>
+                    {iconUploading ? "⏳" : "📷"}
+                  </span>
+                  <span style={{ fontSize: "0.75rem", color: "#fff", fontWeight: 600 }}>
+                    {iconUploading ? "アップロード中..." : iconUrl ? "写真を変更" : "写真を追加"}
+                  </span>
+                </div>
+              </div>
+
+              {/* 写真を削除ボタン */}
+              {iconUrl && (
+                <button
+                  type="button"
+                  onClick={() => { if (confirm("アイコン写真を削除しますか？")) setIconUrl(""); }}
+                  style={{
+                    marginTop: "0.4rem", width: "108px",
+                    padding: "0.3rem 0", fontSize: "0.75rem",
+                    color: "#e05", background: "none",
+                    border: "1px solid #e05", borderRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  写真を削除
+                </button>
+              )}
+            </div>
+
+            {/* 右: 絵文字ピッカー */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-light)", marginBottom: "0.4rem" }}>
+                絵文字（写真なしの場合に表示）
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginBottom: "0.5rem" }}>
+                {EMOJI_PRESETS.map((e) => (
+                  <button
+                    key={e} type="button"
+                    onClick={() => setEmoji(e)}
+                    style={{
+                      fontSize: "1.3rem", padding: "0.25rem 0.35rem", borderRadius: "8px",
+                      background: emoji === e ? "var(--pink-light)" : "#fff",
+                      border: emoji === e ? "2px solid var(--pink)" : "2px solid #f0d0e0",
+                    }}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+              <input
+                style={{ ...inputStyle, width: "5rem" }}
+                value={emoji}
+                onChange={(e) => setEmoji(e.target.value)}
+                maxLength={2}
+              />
+            </div>
           </div>
-          <input style={{ ...inputStyle, width: "6rem" }} value={emoji} onChange={(e) => setEmoji(e.target.value)} maxLength={2} />
         </FormField>
 
         <FormField label="テーマ *">
@@ -184,22 +289,22 @@ export default function EventFormPage() {
           />
         </FormField>
 
-        <FormField label="画像">
+        <FormField label="追加画像">
           <input
-            ref={fileInputRef} type="file" accept="image/*" multiple
+            ref={galleryFileInputRef} type="file" accept="image/*" multiple
             style={{ display: "none" }}
-            onChange={(e) => e.target.files && handleImageUpload(e.target.files)}
+            onChange={(e) => e.target.files && handleGalleryUpload(e.target.files)}
           />
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => galleryFileInputRef.current?.click()}
             style={{
               width: "100%", padding: "0.75rem", borderRadius: "10px",
               border: "2px dashed #f0d0e0", background: "#fff",
               color: "var(--text-light)", fontSize: "0.9rem",
             }}
           >
-            {uploading ? "アップロード中..." : "+ 画像を追加"}
+            {galleryUploading ? "アップロード中..." : "+ 画像を追加"}
           </button>
           {imageUrls.length > 0 && (
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
@@ -208,15 +313,15 @@ export default function EventFormPage() {
                   <img src={url} alt="" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "8px" }} />
                   <button
                     type="button"
-                    onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                    onClick={() => { if (confirm("この画像を削除しますか？")) setImageUrls((prev) => prev.filter((_, j) => j !== i)); }}
                     style={{
                       position: "absolute", top: "-6px", right: "-6px",
-                      background: "#e05", color: "#fff", borderRadius: "50%",
-                      width: "20px", height: "20px", fontSize: "12px", lineHeight: "20px",
+                      background: "#e05", color: "#fff", border: "none",
+                      borderRadius: "50%", width: "1.4rem", height: "1.4rem",
+                      fontSize: "0.8rem", lineHeight: "1.4rem", textAlign: "center",
+                      cursor: "pointer",
                     }}
-                  >
-                    ×
-                  </button>
+                  >×</button>
                 </div>
               ))}
             </div>
@@ -224,11 +329,11 @@ export default function EventFormPage() {
         </FormField>
 
         <button
-          type="submit" disabled={saving || uploading}
+          type="submit" disabled={saving || galleryUploading || iconUploading}
           style={{
             width: "100%", padding: "0.9rem", borderRadius: "12px",
             background: "var(--pink)", color: "#fff",
-            fontFamily: '"Dancing Script", cursive', fontSize: "1.2rem",
+            fontFamily: '"Dancing Script", cursive', fontSize: "1.3rem",
             opacity: saving ? 0.7 : 1,
           }}
         >
@@ -241,7 +346,7 @@ export default function EventFormPage() {
             style={{
               width: "100%", marginTop: "1rem", padding: "0.75rem",
               borderRadius: "12px", background: "none",
-              color: "#e05", fontSize: "0.9rem",
+              color: "#e05", fontSize: "0.85rem",
               border: "1.5px solid #e05",
             }}
           >
