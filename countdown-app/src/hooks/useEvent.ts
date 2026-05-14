@@ -15,8 +15,6 @@ export function useEvent(id: string) {
           id: snap.id,
           ...d,
           imageUrls: d.imageUrls ?? [],
-          mirrorUrls: d.mirrorUrls ?? [],
-          cuteUrls: d.cuteUrls ?? [],
           createdAt: d.createdAt?.toDate() ?? new Date(),
           updatedAt: d.updatedAt?.toDate() ?? new Date(),
         } as Event);

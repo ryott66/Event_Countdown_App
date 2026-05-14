@@ -14,8 +14,6 @@ export interface Event {
   theme: "birthday" | "travel" | "anniversary" | "date";
   memo: string;
   imageUrls: string[];
-  mirrorUrls: string[];
-  cuteUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
   recurring: boolean;

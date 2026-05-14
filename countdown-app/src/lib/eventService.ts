@@ -1,6 +1,6 @@
 import {
   collection, addDoc, updateDoc, deleteDoc,
-  doc, serverTimestamp,
+  doc, serverTimestamp, setDoc, arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "./firebase";
@@ -12,8 +12,6 @@ export interface EventInput {
   theme: "birthday" | "travel" | "anniversary" | "date";
   memo: string;
   imageUrls: string[];
-  mirrorUrls: string[];
-  cuteUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
   recurring: boolean;
@@ -51,4 +49,9 @@ export async function updateEvent(id: string, input: Partial<EventInput>) {
 
 export async function deleteEvent(id: string) {
   await deleteDoc(doc(db, "events", id));
+}
+
+export async function addToGallery(gallery: "mirror" | "cute", urls: string[]): Promise<void> {
+  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
+  await setDoc(doc(db, "config", "galleries"), { [field]: arrayUnion(...urls) }, { merge: true });
 }

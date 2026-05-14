@@ -15,8 +15,6 @@ export function useEvents() {
         id: doc.id,
         ...doc.data(),
         imageUrls: doc.data().imageUrls ?? [],
-        mirrorUrls: doc.data().mirrorUrls ?? [],
-        cuteUrls: doc.data().cuteUrls ?? [],
         createdAt: doc.data().createdAt?.toDate() ?? new Date(),
         updatedAt: doc.data().updatedAt?.toDate() ?? new Date(),
       })) as Event[];
