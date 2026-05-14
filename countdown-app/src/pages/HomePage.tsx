@@ -46,7 +46,7 @@ export default function HomePage() {
                 +
               </button>
               <button
-                onClick={signOutUser}
+                onClick={() => { if (window.confirm("ログアウトしますか？")) signOutUser(); }}
                 style={{ background: "none", color: "var(--text-light)", fontSize: "0.8rem" }}
               >
                 ログアウト
