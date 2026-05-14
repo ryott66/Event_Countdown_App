@@ -313,7 +313,7 @@ Content-Type: `+l.contentType+`\r
     .b26-main {
       height: auto; min-height: calc(100vh - 5rem); width: 100%; margin-top: 5rem;
       background-image: url("${aE}images/background_main.jpg");
-      background-size: cover; background-position: center;
+      background-size: cover; background-position: center 35%;
       background-repeat: no-repeat;
       text-align: center;
       display: flex; flex-direction: column; justify-content: center;
