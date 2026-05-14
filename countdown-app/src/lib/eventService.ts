@@ -55,3 +55,9 @@ export async function addToGallery(gallery: "mirror" | "cute", urls: string[]): 
   const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
   await setDoc(doc(db, "config", "galleries"), { [field]: arrayUnion(...urls) }, { merge: true });
 }
+
+export async function removeFromGallery(gallery: "mirror" | "cute", url: string): Promise<void> {
+  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
+  const { arrayRemove } = await import("firebase/firestore");
+  await setDoc(doc(db, "config", "galleries"), { [field]: arrayRemove(url) }, { merge: true });
+}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useEvents } from "../hooks/useEvents";
 import { useGalleries } from "../hooks/useGalleries";
-import { uploadImage, addToGallery } from "../lib/eventService";
+import { uploadImage, addToGallery, removeFromGallery } from "../lib/eventService";
 import EventCard from "../components/EventCard";
 
 const css = `
@@ -83,10 +83,9 @@ const css = `
     scroll-snap-type: x mandatory; gap: 0.75rem;
     padding: 1rem 0.5rem 0.5rem;
   }
-  .hp-gallery-scroll img {
+  .hp-gallery-img {
     height: 12rem; border: 2px solid rgb(128,128,128);
-    border-radius: 0.5rem; scroll-snap-align: start;
-    object-fit: cover; flex-shrink: 0;
+    border-radius: 0.5rem; object-fit: cover; display: block;
   }
   .hp-gallery-empty {
     color: rgb(167,167,167); font-size: 0.9rem;
@@ -100,7 +99,7 @@ const css = `
     .hp-section-title { font-size: 1.8rem; }
     .hp-galleries-inner { width: 95%; }
     .hp-gallery-name { font-size: 1.3rem; }
-    .hp-gallery-scroll img { height: 8rem; }
+    .hp-gallery-img { height: 8rem; }
   }
 `;
 
@@ -143,7 +142,21 @@ function GallerySection({
         </div>
         {urls.length > 0 ? (
           <div className="hp-gallery-scroll">
-            {urls.map((src, i) => <img key={i} src={src} alt="" />)}
+            {urls.map((src, i) => (
+              <div key={i} style={{ position: "relative", flexShrink: 0 }}>
+                <img src={src} alt="" className="hp-gallery-img" />
+                {isAdmin && (
+                  <button
+                    onClick={() => { if (window.confirm("この写真を削除しますか？")) removeFromGallery(gallery, src); }}
+                    style={{
+                      position: "absolute", top: "-6px", right: "-6px",
+                      background: "#e05", color: "#fff", borderRadius: "50%",
+                      width: "22px", height: "22px", fontSize: "13px", lineHeight: "22px",
+                    }}
+                  >×</button>
+                )}
+              </div>
+            ))}
           </div>
         ) : (
           <p className="hp-gallery-empty">写真がまだありません</p>
