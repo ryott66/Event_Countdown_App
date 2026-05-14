@@ -429,8 +429,9 @@ export default function Birthday2026({ event }: Props) {
         <HTMLFlipBook
           width={bookPageWidth} height={bookPageHeight} size="fixed"
           minWidth={150} maxWidth={1000} minHeight={200} maxHeight={1536}
-          maxShadowOpacity={0.5} showCover={true} mobileScrollSupport={true}
-          startPage={0} drawShadow={true} flippingTime={1000}
+          maxShadowOpacity={isPortrait ? 0.3 : 0.5}
+          showCover={false} mobileScrollSupport={true}
+          startPage={0} drawShadow={true} flippingTime={isPortrait ? 600 : 1000}
           usePortrait={isPortrait} startZIndex={0} autoSize={false}
           clickEventForward={true} useMouseEvents={true}
           showPageCorners={true} disableFlipByClick={false}
