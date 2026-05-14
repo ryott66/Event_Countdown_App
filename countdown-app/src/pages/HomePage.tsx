@@ -16,61 +16,78 @@ import EventCard from "../components/EventCard";
 
 const css = `
   html { font-size: clamp(2px, 1.25vw, 16px); }
-  .hp-body { background-color: #fff0f5; font-family: sans-serif; overflow-x: hidden; }
+  .hp-body { background-color: #fff0f5; font-family: sans-serif; overflow-x: hidden; min-height: 100svh; }
 
   /* === Header === */
   .hp-header {
-    height: 3.8rem; width: 100%;
-    background-color: rgba(207,220,231,0.4);
+    height: 3.5rem; width: 100%;
+    background-color: rgba(207,220,231,0.45);
     position: sticky; top: 0; z-index: 10;
-    display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem;
+    display: flex; align-items: center; padding: 0 1.2rem; gap: 0.8rem;
     backdrop-filter: blur(8px);
   }
   .hp-logo {
     font-family: "Dancing Script", cursive;
-    font-size: 2rem; color: var(--pink); flex: 1;
+    font-size: 2.3rem; color: var(--pink); flex: 1;
   }
   .hp-nav-btn {
-    font-size: 1.3rem; font-family: "Dancing Script", cursive;
-    padding: 0.45rem 1.3rem;
+    font-size: 1.1rem; font-family: "Dancing Script", cursive;
+    padding: 0.35rem 1rem;
     background-color: rgba(229,166,220,0.7); color: #fff;
-    border-radius: 0.7rem; box-shadow: 0 0.2rem #cbcbcb;
+    border-radius: 0.6rem; box-shadow: 0 0.15rem #cbcbcb;
     border: none; cursor: pointer; white-space: nowrap;
   }
-  .hp-nav-btn:active { position: relative; top: 0.2rem; box-shadow: none; }
+  .hp-nav-btn:active { position: relative; top: 0.15rem; box-shadow: none; }
   .hp-nav-btn:hover { background-color: rgba(229,166,220,0.85); }
   .hp-icon-btn {
     background: var(--pink); color: #fff;
-    border-radius: 50%; width: 2.4rem; height: 2.4rem;
-    font-size: 1.3rem; line-height: 1; flex-shrink: 0;
+    border-radius: 50%; width: 2rem; height: 2rem;
+    font-size: 1.1rem; line-height: 1; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0.2rem #cbcbcb; border: none; cursor: pointer;
+    box-shadow: 0 0.15rem #cbcbcb; border: none; cursor: pointer;
   }
   .hp-logout-btn {
-    background: none; color: var(--text-light); font-size: 0.9rem;
+    background: none; color: var(--text-light); font-size: 0.85rem;
     white-space: nowrap; border: none; cursor: pointer;
+  }
+
+  /* === Main 2-col Grid === */
+  .hp-main {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 1.8rem;
+    max-width: 1400px; margin: 0 auto;
+    padding: 1.5rem 2rem 3rem;
+    align-items: start;
+  }
+  .hp-events-section { min-width: 0; }
+  .hp-memories-section {
+    background-color: #f9f0d7;
+    border-radius: 1rem;
+    padding: 1rem 1rem 1.5rem;
+    position: sticky; top: 4.5rem;
+    min-width: 0;
+    box-shadow: 0 4px 18px rgba(180,150,80,0.12);
   }
 
   /* === Section title === */
   .hp-section-title {
     font-family: "Dancing Script", cursive;
-    color: rgba(230,138,182,0.85);
-    font-size: 3.3rem;
-    padding-top: 3.5rem; padding-bottom: 2rem; margin: 0;
-    text-align: center;
+    color: rgba(230,138,182,0.9);
+    font-size: 2.2rem;
+    margin: 0 0 0.8rem;
+    text-align: left;
   }
 
   /* === Events === */
-  .hp-events {
-    padding: 0 0 4rem; width: 85%; margin: 0 auto;
-  }
   .hp-sub-title {
-    font-size: 1.4rem; color: var(--text-light);
-    margin-bottom: 0.8rem; margin-top: 1.5rem;
+    font-size: 1.15rem; color: var(--text-light);
+    margin-bottom: 0.5rem; margin-top: 1rem;
     font-family: "Dancing Script", cursive;
   }
-  .hp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .hp-events-empty { color: var(--text-light); font-size: 1rem; }
+  .hp-sub-title:first-of-type { margin-top: 0; }
+  .hp-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.7rem; }
+  .hp-events-empty { color: var(--text-light); font-size: 0.9rem; }
 
   /* === Event Cards === */
   .ec-card {
@@ -85,7 +102,7 @@ const css = `
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-    font-size: 3.5rem;
+    font-size: 2rem;
   }
   .ec-upload-overlay {
     position: absolute; inset: 0;
@@ -95,128 +112,135 @@ const css = `
     cursor: pointer; pointer-events: none;
   }
   .ec-media:hover .ec-upload-overlay { opacity: 1; pointer-events: auto; }
-  .ec-info { padding: 0.8rem 1rem 1rem; }
+  .ec-info { padding: 0.45rem 0.6rem 0.6rem; }
   .ec-title {
-    font-family: "Dancing Script", cursive; font-size: 1.3rem; color: var(--text);
+    font-family: "Dancing Script", cursive; font-size: 0.95rem; color: var(--text);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .ec-date { font-size: 0.88rem; color: var(--text-light); margin-top: 0.2rem; }
+  .ec-date { font-size: 0.7rem; color: var(--text-light); margin-top: 0.1rem; }
   .ec-memo {
-    font-size: 0.82rem; color: var(--text-light); margin-top: 0.3rem;
+    font-size: 0.65rem; color: var(--text-light); margin-top: 0.15rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     opacity: 0.8;
   }
-  .ec-countdown { margin-top: 0.4rem; text-align: right; }
-  .ec-days { font-family: "Dancing Script", cursive; font-size: 1.8rem; color: var(--pink); line-height: 1; }
-  .ec-days-label { font-size: 0.7rem; color: var(--text-light); }
-  .ec-today { color: var(--pink); font-family: "Dancing Script", cursive; font-size: 1.2rem; }
-  .ec-past-days { color: var(--text-light); font-size: 0.85rem; }
+  .ec-countdown { margin-top: 0.2rem; text-align: right; }
+  .ec-days { font-family: "Dancing Script", cursive; font-size: 1.2rem; color: var(--pink); line-height: 1; }
+  .ec-days-label { font-size: 0.6rem; color: var(--text-light); }
+  .ec-today { color: var(--pink); font-family: "Dancing Script", cursive; font-size: 0.9rem; }
+  .ec-past-days { color: var(--text-light); font-size: 0.7rem; }
 
   /* === Memories === */
-  .hp-galleries-wrap {
-    width: 100%; padding: 0 0 8rem;
-    background-color: #f9f0d7;
-  }
-  .hp-galleries-inner { width: 85%; margin: 0 auto; }
-  .hp-gallery-block { margin-bottom: 5rem; }
+  .hp-gallery-block { margin-bottom: 1.2rem; }
   .hp-gallery-block:last-child { margin-bottom: 0; }
   .hp-gallery-frame {
     background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
-    border: 0.7rem solid #c9c9c9;
-    padding: 1rem 1rem 3rem 1rem;
+    border: 0.35rem solid #c9c9c9;
+    padding: 0.6rem 0.6rem 1.2rem;
   }
   .hp-gallery-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 0; gap: 1rem; padding: 0 1rem;
+    margin-bottom: 0; gap: 0.6rem; padding: 0 0.4rem;
   }
   .hp-gallery-name {
     font-family: "Kaushan Script", cursive;
-    font-size: 2.2rem; color: rgb(167,167,167); margin: 0;
+    font-size: 1.6rem; color: rgb(140,140,140); margin: 0;
   }
   .hp-gallery-action-btn {
-    font-size: 0.95rem; padding: 0.4rem 0.9rem;
-    border-radius: 0.7rem; border: 1.5px solid var(--pink);
+    font-size: 0.85rem; padding: 0.3rem 0.7rem;
+    border-radius: 0.6rem; border: 1.5px solid var(--pink);
     color: var(--pink); background: rgba(255,255,255,0.6);
     white-space: nowrap; cursor: pointer;
   }
   .hp-gallery-action-btn:hover { background: rgba(230,138,182,0.25); }
   .hp-gallery-action-btn.done { background: var(--pink); color: #fff; }
   .hp-gallery-action-btn.done:hover { background: var(--pink-dark); }
-  .hp-gallery-actions { display: flex; gap: 0.5rem; }
+  .hp-gallery-actions { display: flex; gap: 0.4rem; }
 
   /* 通常表示 */
   .hp-gallery-scroll {
     display: flex; overflow-x: auto;
-    scroll-snap-type: x mandatory; gap: 1rem; padding: 2rem;
+    scroll-snap-type: x mandatory; gap: 0.6rem; padding: 0.8rem 0.5rem 0.5rem;
   }
   .hp-gallery-img {
-    height: 20rem; border: 0.25rem solid rgb(128,128,128);
-    border-radius: 1rem; object-fit: cover; display: block;
+    height: 15rem; border: 0.15rem solid rgb(128,128,128);
+    border-radius: 0.6rem; object-fit: cover; display: block;
     scroll-snap-align: start; flex-shrink: 0;
   }
 
   /* 編集モード */
   .hp-edit-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1rem; padding: 2rem;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem; padding: 0.8rem 0.5rem;
   }
   .hp-edit-photo {
-    position: relative; border-radius: 0.5rem;
+    position: relative; border-radius: 0.4rem;
     overflow: hidden; aspect-ratio: 1; touch-action: none;
-    border: 0.25rem solid rgb(128,128,128);
+    border: 0.15rem solid rgb(128,128,128);
   }
   .hp-edit-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .hp-delete-badge {
-    position: absolute; top: 0.3rem; right: 0.3rem;
+    position: absolute; top: 0.2rem; right: 0.2rem;
     background: rgba(220,0,50,0.85); color: #fff;
-    border-radius: 50%; width: 2rem; height: 2rem;
-    font-size: 1.2rem; line-height: 2rem; text-align: center;
+    border-radius: 50%; width: 1.5rem; height: 1.5rem;
+    font-size: 0.9rem; line-height: 1.5rem; text-align: center;
     box-shadow: 0 1px 4px rgba(0,0,0,0.3); border: none; cursor: pointer;
   }
   .hp-drag-hint {
-    position: absolute; bottom: 0.3rem; left: 0.3rem;
-    color: rgba(255,255,255,0.85); font-size: 1.5rem; line-height: 1;
+    position: absolute; bottom: 0.2rem; left: 0.3rem;
+    color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1;
     pointer-events: none;
     text-shadow: 0 0 4px rgba(0,0,0,0.4);
   }
   .hp-gallery-empty {
-    color: rgb(167,167,167); font-size: 1.5rem;
-    padding: 3rem 1rem; text-align: center;
+    color: rgb(167,167,167); font-size: 0.9rem;
+    padding: 1.5rem 0.5rem; text-align: center;
+  }
+
+  /* === Tablet: stack columns === */
+  @media (max-width: 1023px) {
+    .hp-main {
+      grid-template-columns: 1fr;
+      gap: 1.5rem; padding: 1.2rem 1.5rem 2.5rem;
+    }
+    .hp-memories-section { position: static; }
+    .hp-gallery-img { height: 18rem; }
+    .hp-cards { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 0.6rem; }
   }
 
   /* === Mobile === */
   @media (max-width: 767px) {
     html { font-size: 13px; }
     .hp-header {
-      height: auto; padding: 0.5rem 0.8rem; gap: 0.5rem;
+      height: auto; padding: 0.5rem 0.7rem; gap: 0.4rem;
       flex-wrap: wrap;
     }
-    .hp-logo { font-size: 1.8rem; }
-    .hp-nav-btn { font-size: 1rem; padding: 0.35rem 0.8rem; border-radius: 0.6rem; box-shadow: 0 0.15rem #cbcbcb; }
-    .hp-icon-btn { width: 2.2rem; height: 2.2rem; font-size: 1.2rem; box-shadow: 0 0.15rem #cbcbcb; }
-    .hp-logout-btn { font-size: 0.85rem; }
+    .hp-logo { font-size: 1.9rem; }
+    .hp-nav-btn { font-size: 0.95rem; padding: 0.3rem 0.7rem; border-radius: 0.5rem; }
+    .hp-icon-btn { width: 1.9rem; height: 1.9rem; font-size: 1rem; }
+    .hp-logout-btn { font-size: 0.8rem; }
 
-    .hp-section-title { font-size: 2.8rem; padding-top: 3rem; padding-bottom: 1.5rem; }
-    .hp-events { width: 95%; padding: 0 0 3rem; }
-    .hp-sub-title { font-size: 1.3rem; }
-    .hp-events-empty { font-size: 1rem; }
-    .hp-galleries-wrap { padding-bottom: 4rem; }
-    .hp-galleries-inner { width: 95%; }
-    .hp-gallery-block { margin-bottom: 3rem; }
-    .hp-gallery-frame { padding: 0.5rem 0.4rem 1.2rem; border-width: 0.25rem; }
-    .hp-gallery-header { padding: 0 0.5rem; }
-    .hp-gallery-name { font-size: 1.6rem; }
-    .hp-gallery-action-btn { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
-    .hp-gallery-scroll { padding: 1rem 0.5rem; gap: 0.5rem; }
-    .hp-gallery-img { height: 10rem; border-width: 0.15rem; border-radius: 0.5rem; }
-    .hp-edit-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; padding: 1rem 0.5rem; }
-    .hp-delete-badge { width: 1.6rem; height: 1.6rem; font-size: 1rem; line-height: 1.6rem; }
-    .hp-gallery-empty { font-size: 1rem; padding: 1.5rem 0.5rem; }
-    .hp-cards { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-    .ec-title { font-size: 1.05rem; }
-    .ec-days { font-size: 1.4rem; }
-    .ec-info { padding: 0.5rem 0.7rem 0.7rem; }
-    .ec-emoji-bg { font-size: 2.5rem; }
+    .hp-main { padding: 0.8rem 0.8rem 2rem; gap: 1.2rem; }
+    .hp-memories-section { padding: 0.7rem 0.7rem 1rem; border-radius: 0.7rem; }
+    .hp-section-title { font-size: 1.8rem; margin-bottom: 0.6rem; }
+    .hp-sub-title { font-size: 1rem; margin-top: 0.7rem; }
+    .hp-events-empty { font-size: 0.85rem; }
+
+    .hp-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; }
+    .ec-title { font-size: 0.9rem; }
+    .ec-days { font-size: 1.15rem; }
+    .ec-info { padding: 0.35rem 0.5rem 0.5rem; }
+    .ec-emoji-bg { font-size: 1.8rem; }
+
+    .hp-gallery-block { margin-bottom: 0.8rem; }
+    .hp-gallery-frame { padding: 0.4rem 0.3rem 0.8rem; border-width: 0.2rem; }
+    .hp-gallery-header { padding: 0 0.3rem; }
+    .hp-gallery-name { font-size: 1.3rem; }
+    .hp-gallery-action-btn { font-size: 0.75rem; padding: 0.25rem 0.55rem; }
+    .hp-gallery-scroll { padding: 0.6rem 0.3rem 0.3rem; gap: 0.4rem; }
+    .hp-gallery-img { height: 13rem; border-width: 0.12rem; border-radius: 0.4rem; }
+    .hp-edit-grid { gap: 0.35rem; padding: 0.5rem 0.3rem; }
+    .hp-delete-badge { width: 1.3rem; height: 1.3rem; font-size: 0.8rem; line-height: 1.3rem; }
+    .hp-gallery-empty { font-size: 0.85rem; padding: 1rem 0.5rem; }
   }
 `;
 
@@ -397,36 +421,32 @@ export default function HomePage() {
         )}
       </header>
 
-      <main id="hp-events">
-        <h2 className="hp-section-title">Events</h2>
-        <div className="hp-events">
+      <div className="hp-main">
+        <section className="hp-events-section" id="hp-events">
+          <h2 className="hp-section-title">Events</h2>
           {loading ? (
             <p className="hp-events-empty">読み込み中...</p>
           ) : (
             <>
-              <section>
-                <p className="hp-sub-title">これから</p>
-                {upcoming.length === 0
-                  ? <p className="hp-events-empty">イベントがありません</p>
-                  : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} isAdmin={isAdmin} />)}</div>}
-              </section>
+              <p className="hp-sub-title">これから</p>
+              {upcoming.length === 0
+                ? <p className="hp-events-empty">イベントがありません</p>
+                : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} isAdmin={isAdmin} />)}</div>}
               {past.length > 0 && (
-                <section>
+                <>
                   <p className="hp-sub-title">過去</p>
                   <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast isAdmin={isAdmin} />)}</div>
-                </section>
+                </>
               )}
             </>
           )}
-        </div>
-      </main>
+        </section>
 
-      <div id="hp-galleries" className="hp-galleries-wrap">
-        <h2 className="hp-section-title">Memories</h2>
-        <div className="hp-galleries-inner">
+        <aside className="hp-memories-section" id="hp-galleries">
+          <h2 className="hp-section-title">Memories</h2>
           <GallerySection title="Mirror Moments" urls={galleries.mirrorUrls} gallery="mirror" isAdmin={isAdmin} />
           <GallerySection title="Cutest Moments" urls={galleries.cuteUrls} gallery="cute" isAdmin={isAdmin} />
-        </div>
+        </aside>
       </div>
     </div>
   );
