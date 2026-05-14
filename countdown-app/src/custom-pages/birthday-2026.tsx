@@ -5,7 +5,6 @@ import confetti from "canvas-confetti";
 import HTMLFlipBook from "react-pageflip";
 import { handleButtonClick } from "../utils/handleButtonClick";
 import { useAuth } from "../contexts/AuthContext";
-import { useGalleries } from "../hooks/useGalleries";
 import type { Event } from "../types";
 
 // ========================================
@@ -71,7 +70,6 @@ function useCountdown(dateStr: string) {
 export default function Birthday2026({ event }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { galleries } = useGalleries();
   const { days, hours, minutes, seconds, isToday } = useCountdown(event.date);
   const [cakeAnimating, setCakeAnimating] = useState(false);
   const [heartAnimating, setHeartAnimating] = useState(false);
@@ -387,10 +385,6 @@ export default function Birthday2026({ event }: Props) {
             onClick={(e) => { e.preventDefault(); document.getElementById("b26-countdown")?.scrollIntoView({ behavior: "smooth" }); }}>
             Countdown
           </a>
-          <a href="#b26-memories" className="b26-header-btn"
-            onClick={(e) => { e.preventDefault(); document.getElementById("b26-memories")?.scrollIntoView({ behavior: "smooth" }); }}>
-            Memories
-          </a>
           <a href="#b26-trip" className="b26-header-btn"
             onClick={(e) => { e.preventDefault(); document.getElementById("b26-trip")?.scrollIntoView({ behavior: "smooth" }); }}>
             Date
@@ -449,23 +443,6 @@ export default function Birthday2026({ event }: Props) {
             </div>
           ))}
         </HTMLFlipBook>
-      </div>
-
-      {/* Memories（去年の固定ギャラリー） */}
-      <div id="b26-memories" className="b26-memories">
-        <h2 className="b26-memory-title">Memories</h2>
-        <div className="b26-galleries">
-          <p className="b26-gallery-title">Mirror Moments</p>
-          <div className="b26-pic-gallery">
-            {galleries.mirrorUrls.map((src: string, i: number) => <img key={i} src={src} alt={`Mirror ${i + 1}`} />)}
-          </div>
-        </div>
-        <div className="b26-galleries">
-          <p className="b26-gallery-title">Cutest Moments</p>
-          <div className="b26-pic-gallery">
-            {galleries.cuteUrls.map((src: string, i: number) => <img key={i} src={src} alt={`Cute ${i + 1}`} />)}
-          </div>
-        </div>
       </div>
 
       {/* Trip Section */}
