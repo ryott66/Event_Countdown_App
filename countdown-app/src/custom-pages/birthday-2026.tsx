@@ -151,7 +151,7 @@ export default function Birthday2026({ event }: Props) {
     /* === Main === */
     .b26-main {
       height: auto; min-height: calc(100vh - 5rem); width: 100%; margin-top: 5rem;
-      background-image: url("${BASE}images/background_main.jpg");
+      background-image: url("${BASE}images/background_main.webp");
       background-size: cover; background-position: center 15%;
       background-repeat: no-repeat;
       text-align: center;
@@ -219,7 +219,7 @@ export default function Birthday2026({ event }: Props) {
     /* === Trip === */
     #b26-trip {
       height: 50rem; margin: 0;
-      background-image: url("${BASE}images/Trip.jpg");
+      background-image: url("${BASE}images/Trip.webp");
       background-size: cover; background-position: center;
       background-repeat: no-repeat;
     }
