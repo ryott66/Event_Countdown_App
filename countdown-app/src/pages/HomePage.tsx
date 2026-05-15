@@ -320,6 +320,7 @@ function GallerySection({
     for (const file of Array.from(files)) {
       const u = await uploadImage(file, "galleries", gallery);
       uploaded.push(u);
+      setLocalUrls((prev) => [...prev, u]);
     }
     await addToGallery(gallery, uploaded);
     setUploading(false);
