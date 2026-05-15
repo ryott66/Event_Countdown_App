@@ -185,7 +185,7 @@ export default function EventFormPage() {
                 }}
               >
                 {iconUrl ? (
-                  <img src={iconUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={iconUrl} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 ) : (
                   <>
                     <span style={{ fontSize: "2.6rem", lineHeight: 1 }}>{emoji}</span>

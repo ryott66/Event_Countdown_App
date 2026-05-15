@@ -18,16 +18,16 @@ interface Props {
 
 const BASE = import.meta.env.BASE_URL;
 const BOOK_IMAGES = [
-  `${BASE}images/book-image/first.png`,
-  `${BASE}images/book-image/book1.png`,
-  `${BASE}images/book-image/book2.png`,
-  `${BASE}images/book-image/book3.png`,
-  `${BASE}images/book-image/book4.png`,
-  `${BASE}images/book-image/book5.png`,
-  `${BASE}images/book-image/book6.png`,
-  `${BASE}images/book-image/book7.png`,
-  `${BASE}images/book-image/book8.png`,
-  `${BASE}images/book-image/last.png`,
+  `${BASE}images/book-image/first.webp`,
+  `${BASE}images/book-image/book1.webp`,
+  `${BASE}images/book-image/book2.webp`,
+  `${BASE}images/book-image/book3.webp`,
+  `${BASE}images/book-image/book4.webp`,
+  `${BASE}images/book-image/book5.webp`,
+  `${BASE}images/book-image/book6.webp`,
+  `${BASE}images/book-image/book7.webp`,
+  `${BASE}images/book-image/book8.webp`,
+  `${BASE}images/book-image/last.webp`,
 ];
 
 function launchConfetti() {
@@ -439,7 +439,10 @@ export default function Birthday2026({ event }: Props) {
         >
           {BOOK_IMAGES.map((src, i) => (
             <div key={i} className="page">
-              <img src={src} width={bookPageWidth} height={bookPageHeight} alt="" />
+              <img
+                src={src} width={bookPageWidth} height={bookPageHeight} alt=""
+                loading={i === 0 ? "eager" : "lazy"} decoding="async"
+              />
             </div>
           ))}
         </HTMLFlipBook>
@@ -459,7 +462,7 @@ export default function Birthday2026({ event }: Props) {
         <div className="b26-new-memories">
           <h2 className="b26-memory-title">2026 Memories</h2>
           <div className="b26-new-gallery">
-            {event.imageUrls.map((url, i) => <img key={i} src={url} alt="" />)}
+            {event.imageUrls.map((url, i) => <img key={i} src={url} alt="" loading="lazy" decoding="async" />)}
           </div>
         </div>
       )}

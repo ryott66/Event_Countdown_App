@@ -259,7 +259,7 @@ function SortablePhoto({ url, onDelete }: { url: string; onDelete: () => void })
       {...attributes}
       {...listeners}
     >
-      <img src={url} alt="" />
+      <img src={url} alt="" loading="lazy" decoding="async" />
       <button
         className="hp-delete-badge"
         onPointerDown={(e) => e.stopPropagation()}
@@ -372,7 +372,7 @@ function GallerySection({
         ) : (
           <div className="hp-gallery-scroll">
             {displayUrls.map((src, i) => (
-              <img key={i} src={src} alt="" className="hp-gallery-img" />
+              <img key={i} src={src} alt="" className="hp-gallery-img" loading="lazy" decoding="async" />
             ))}
           </div>
         )}

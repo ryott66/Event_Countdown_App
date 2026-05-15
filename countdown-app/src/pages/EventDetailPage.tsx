@@ -180,6 +180,8 @@ function TemplateDetail({ event }: { event: Event }) {
                 key={i}
                 src={url}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 style={{
                   width: "min(75vw, 300px)",
                   height: "min(75vw, 300px)",
