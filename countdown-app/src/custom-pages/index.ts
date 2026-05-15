@@ -1,8 +1,11 @@
-import type { ComponentType } from "react";
+import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 import type { Event } from "../types";
-import Birthday2026 from "./birthday-2026";
 
 // カスタムページを追加するときはここに登録するだけでOK
-export const customPageRegistry: Record<string, ComponentType<{ event: Event }>> = {
-  "birthday-2026": Birthday2026,
+// 各ページは個別の chunk に分割され、必要になったときだけダウンロードされる
+export const customPageRegistry: Record<
+  string,
+  LazyExoticComponent<ComponentType<{ event: Event }>>
+> = {
+  "birthday-2026": lazy(() => import("./birthday-2026")),
 };
