@@ -383,7 +383,7 @@ function GallerySection({
 }
 
 export default function HomePage() {
-  const { user, signOutUser } = useAuth();
+  const { user, signInWithGoogle, signOutUser } = useAuth();
   const { events, loading } = useEvents();
   const { galleries } = useGalleries();
   const navigate = useNavigate();
@@ -419,6 +419,11 @@ export default function HomePage() {
               ログアウト
             </button>
           </>
+        )}
+        {user.state === "guest" && (
+          <button className="hp-logout-btn" onClick={() => signInWithGoogle()}>
+            ログイン
+          </button>
         )}
       </header>
 
