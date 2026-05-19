@@ -33,7 +33,7 @@ export default function EventCard({ event, isPast }: Props) {
     >
       <div className="ec-media">
         {thumbUrl
-          ? <img src={thumbUrl} alt="" className="ec-photo" loading="lazy" decoding="async" />
+          ? <img src={thumbUrl} alt="" className="ec-photo" loading="eager" decoding="async" fetchPriority="high" />
           : <div className="ec-emoji-bg">{event.emoji}</div>
         }
       </div>

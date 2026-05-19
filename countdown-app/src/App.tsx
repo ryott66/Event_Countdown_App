@@ -14,6 +14,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const EventFormPage = lazy(() => import("./pages/EventFormPage"));
 const EventDetailPage = lazy(() => import("./pages/EventDetailPage"));
+const ImageMigrationPage = lazy(() => import("./pages/ImageMigrationPage"));
 
 function PageFallback() {
   return <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>読み込み中...</div>;
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/events/new" element={<EventFormPage />} />
           <Route path="/events/:id/edit" element={<EventFormPage />} />
+          <Route path="/admin/optimize" element={<ImageMigrationPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Suspense>

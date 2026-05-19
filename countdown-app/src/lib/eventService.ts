@@ -27,7 +27,10 @@ export async function uploadImage(file: File, eventId: string, folder = ""): Pro
     ? `events/${eventId}/${folder}/${filename}`
     : `events/${eventId}/${filename}`;
   const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, blob, { contentType: "image/jpeg" });
+  await uploadBytes(storageRef, blob, {
+    contentType: "image/jpeg",
+    cacheControl: "public, max-age=31536000, immutable",
+  });
   return getDownloadURL(storageRef);
 }
 
