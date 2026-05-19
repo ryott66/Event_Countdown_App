@@ -59,7 +59,9 @@ export async function migrateAllImages(
 ): Promise<{ total: number; failures: number; savedBytes: number }> {
   // 1) 全イベント取得
   const eventsSnap = await getDocs(collection(db, "events"));
-  const events = eventsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
+  const events: Array<Record<string, unknown> & { id: string }> = eventsSnap.docs.map(
+    (d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }),
+  );
 
   // 2) ギャラリー設定取得
   const galleriesSnap = await getDoc(doc(db, "config", "galleries"));
