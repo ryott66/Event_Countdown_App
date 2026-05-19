@@ -1,8 +1,8 @@
 // アップロード前にブラウザ側で画像を圧縮する
 // 長辺を maxDimension px にリサイズ + JPEG (quality 0.85) に再エンコード
 
-const DEFAULT_MAX_DIMENSION = 1600;
-const DEFAULT_QUALITY = 0.85;
+const DEFAULT_MAX_DIMENSION = 800;
+const DEFAULT_QUALITY = 0.78;
 
 export async function compressImage(
   file: File,

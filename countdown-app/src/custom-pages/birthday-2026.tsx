@@ -148,6 +148,11 @@ export default function Birthday2026({ event }: Props) {
       opacity: 0.8; text-decoration: none;
     }
 
+    /* 中間幅では右端の "Remina's Birthday" がヘッダ内に収まらず折り返すため非表示 */
+    @media (max-width: 1100px) {
+      .b26-header-right { display: none; }
+    }
+
     /* === Main === */
     .b26-main {
       height: auto; min-height: calc(100vh - 5rem); width: 100%; margin-top: 5rem;

@@ -69,3 +69,4 @@ export async function updateGalleryOrder(gallery: "mirror" | "cute", urls: strin
   const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
   await setDoc(doc(db, "config", "galleries"), { [field]: urls }, { merge: true });
 }
+
