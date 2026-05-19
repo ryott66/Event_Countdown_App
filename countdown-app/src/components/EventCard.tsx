@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Event } from "../types";
 
 interface Props {
   event: Event;
   isPast?: boolean;
-  isAdmin?: boolean;
 }
 
 function daysUntil(dateStr: string) {
@@ -19,11 +17,6 @@ function daysUntil(dateStr: string) {
 export default function EventCard({ event, isPast }: Props) {
   const navigate = useNavigate();
   const days = daysUntil(event.date);
-  const [thumbUrl, setThumbUrl] = useState<string>(event.iconUrl ?? "");
-
-  useEffect(() => {
-    setThumbUrl(event.iconUrl ?? "");
-  }, [event.iconUrl]);
 
   return (
     <div
@@ -32,8 +25,8 @@ export default function EventCard({ event, isPast }: Props) {
       onClick={() => navigate(`/events/${event.id}`)}
     >
       <div className="ec-media">
-        {thumbUrl
-          ? <img src={thumbUrl} alt="" className="ec-photo" loading="eager" decoding="async" fetchPriority="high" />
+        {event.iconUrl
+          ? <img src={event.iconUrl} alt="" className="ec-photo" loading="eager" decoding="async" fetchPriority="high" />
           : <div className="ec-emoji-bg">{event.emoji}</div>
         }
       </div>

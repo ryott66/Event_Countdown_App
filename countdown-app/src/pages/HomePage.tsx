@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useEvents } from "../hooks/useEvents";
 import { useGalleries } from "../hooks/useGalleries";
 import { uploadImage, addToGallery, updateGalleryOrder } from "../lib/eventService";
+import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import EventCard from "../components/EventCard";
 
 const css = `
@@ -277,7 +278,7 @@ function GallerySection({
 }: {
   title: string;
   urls: string[];
-  gallery: "mirror" | "cute";
+  gallery: GalleryKey;
   isAdmin: boolean;
 }) {
   const [editMode, setEditMode] = useState(false);
@@ -437,11 +438,11 @@ export default function HomePage() {
               <p className="hp-sub-title">これから</p>
               {upcoming.length === 0
                 ? <p className="hp-events-empty">イベントがありません</p>
-                : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} isAdmin={isAdmin} />)}</div>}
+                : <div className="hp-cards">{upcoming.map((e) => <EventCard key={e.id} event={e} />)}</div>}
               {past.length > 0 && (
                 <>
                   <p className="hp-sub-title">過去</p>
-                  <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast isAdmin={isAdmin} />)}</div>
+                  <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast />)}</div>
                 </>
               )}
             </>
@@ -450,8 +451,15 @@ export default function HomePage() {
 
         <aside className="hp-memories-section" id="hp-galleries">
           <h2 className="hp-section-title">Memories</h2>
-          <GallerySection title="Mirror Moments" urls={galleries.mirrorUrls} gallery="mirror" isAdmin={isAdmin} />
-          <GallerySection title="Cutest Moments" urls={galleries.cuteUrls} gallery="cute" isAdmin={isAdmin} />
+          {(Object.entries(GALLERIES) as [GalleryKey, typeof GALLERIES[GalleryKey]][]).map(([key, def]) => (
+            <GallerySection
+              key={key}
+              title={def.title}
+              urls={galleries[def.field] ?? []}
+              gallery={key}
+              isAdmin={isAdmin}
+            />
+          ))}
         </aside>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import type { ThemeKey } from "../constants/themes";
+
 export type AuthState = "admin" | "guest" | "unauthorized" | "loading";
 
 export interface AppUser {
@@ -11,13 +13,12 @@ export interface Event {
   title: string;
   date: string;
   emoji: string;
-  theme: "birthday" | "travel" | "anniversary" | "date";
+  theme: ThemeKey;
   memo: string;
   iconUrl: string;
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
-  recurring: boolean;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

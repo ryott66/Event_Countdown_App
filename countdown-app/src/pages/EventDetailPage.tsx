@@ -4,38 +4,8 @@ import confetti from "canvas-confetti";
 import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
 import { customPageRegistry } from "../custom-pages";
+import { THEMES } from "../constants/themes";
 import type { Event } from "../types";
-
-const THEMES = {
-  birthday: {
-    bg: "linear-gradient(160deg, #fff0f5 0%, #ffe4ef 100%)",
-    accent: "#e68ab6",
-    numColor: "rgb(200, 247, 255)",
-    numBg: "rgba(230, 138, 182, 0.7)",
-    confettiColors: ["#ff9ec4", "#ffb3d1", "#fff0f5", "#ff69a5", "#ffd6e7"],
-  },
-  travel: {
-    bg: "linear-gradient(160deg, #e3f6ff 0%, #c8ecff 100%)",
-    accent: "#4fc3f7",
-    numColor: "rgb(200, 247, 255)",
-    numBg: "rgba(79, 195, 247, 0.6)",
-    confettiColors: ["#4fc3f7", "#81d4fa", "#b3e5fc", "#29b6f6", "#e3f6ff"],
-  },
-  anniversary: {
-    bg: "linear-gradient(160deg, #fce4ec 0%, #f8bbd9 100%)",
-    accent: "#8b1a4a",
-    numColor: "rgb(255, 220, 235)",
-    numBg: "rgba(139, 26, 74, 0.6)",
-    confettiColors: ["#8b1a4a", "#c2185b", "#f06292", "#fce4ec", "#ff80ab"],
-  },
-  date: {
-    bg: "linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%)",
-    accent: "#ff8a50",
-    numColor: "rgb(255, 245, 220)",
-    numBg: "rgba(255, 138, 80, 0.6)",
-    confettiColors: ["#ff8a50", "#ffb74d", "#ffd54f", "#fff3e0", "#ffcc02"],
-  },
-};
 
 function useCountdown(dateStr: string) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isToday: false, isPast: false });
@@ -99,7 +69,7 @@ function TemplateDetail({ event }: { event: Event }) {
 
   useEffect(() => {
     if (!isToday) return;
-    const fire = () => confetti({ particleCount: 80, spread: 70, colors: theme.confettiColors, origin: { y: 0.6 } });
+    const fire = () => confetti({ particleCount: 80, spread: 70, colors: [...theme.confettiColors], origin: { y: 0.6 } });
     fire();
     const id = setInterval(fire, 3000);
     return () => clearInterval(id);

@@ -3,13 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
 import { createEvent, updateEvent, deleteEvent, uploadImage } from "../lib/eventService";
-
-const THEMES = [
-  { value: "birthday", label: "🎂 Birthday" },
-  { value: "travel", label: "✈️ Travel" },
-  { value: "anniversary", label: "🥂 Anniversary" },
-  { value: "date", label: "🍽️ Date" },
-] as const;
+import { THEMES, THEME_KEYS, type ThemeKey } from "../constants/themes";
 
 const EMOJI_PRESETS = ["🎂", "✈️", "🥂", "🍽️", "🎉", "🌸", "💍", "🎁", "🌊", "🏔️", "🎵", "❤️"];
 
@@ -39,7 +33,7 @@ const inputStyle: React.CSSProperties = {
 export default function EventFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
-  const { event, loading } = useEvent(isEdit ? id! : "__skip__");
+  const { event, loading } = useEvent(isEdit ? id : null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const iconFileInputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +42,7 @@ export default function EventFormPage() {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [emoji, setEmoji] = useState("🎉");
-  const [theme, setTheme] = useState<"birthday" | "travel" | "anniversary" | "date">("birthday");
+  const [theme, setTheme] = useState<ThemeKey>("birthday");
   const [memo, setMemo] = useState("");
   const [iconUrl, setIconUrl] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -109,7 +103,6 @@ export default function EventFormPage() {
       title, date, emoji, theme, memo, iconUrl, imageUrls,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
-      recurring: false,
       createdBy: user.uid ?? "",
     };
     try {
@@ -263,18 +256,18 @@ export default function EventFormPage() {
 
         <FormField label="テーマ *">
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-            {THEMES.map((t) => (
+            {THEME_KEYS.map((key) => (
               <button
-                key={t.value} type="button"
-                onClick={() => setTheme(t.value)}
+                key={key} type="button"
+                onClick={() => setTheme(key)}
                 style={{
                   padding: "0.5rem 1rem", borderRadius: "20px", fontSize: "0.9rem",
-                  background: theme === t.value ? "var(--pink)" : "#fff",
-                  color: theme === t.value ? "#fff" : "var(--text)",
-                  border: theme === t.value ? "2px solid var(--pink)" : "2px solid #f0d0e0",
+                  background: theme === key ? "var(--pink)" : "#fff",
+                  color: theme === key ? "#fff" : "var(--text)",
+                  border: theme === key ? "2px solid var(--pink)" : "2px solid #f0d0e0",
                 }}
               >
-                {t.label}
+                {THEMES[key].label}
               </button>
             ))}
           </div>

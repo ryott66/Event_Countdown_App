@@ -1,22 +1,23 @@
 import {
   collection, addDoc, updateDoc, deleteDoc,
-  doc, serverTimestamp, setDoc, arrayUnion, arrayRemove,
+  doc, serverTimestamp, setDoc, arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "./firebase";
 import { compressImage } from "./imageCompression";
+import { GALLERIES, type GalleryKey } from "../constants/galleries";
+import type { ThemeKey } from "../constants/themes";
 
 export interface EventInput {
   title: string;
   date: string;
   emoji: string;
-  theme: "birthday" | "travel" | "anniversary" | "date";
+  theme: ThemeKey;
   memo: string;
   iconUrl: string;
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
-  recurring: boolean;
   createdBy: string;
 }
 
@@ -58,18 +59,12 @@ export async function deleteEvent(id: string) {
   await deleteDoc(doc(db, "events", id));
 }
 
-export async function addToGallery(gallery: "mirror" | "cute", urls: string[]): Promise<void> {
-  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
+export async function addToGallery(gallery: GalleryKey, urls: string[]): Promise<void> {
+  const field = GALLERIES[gallery].field;
   await setDoc(doc(db, "config", "galleries"), { [field]: arrayUnion(...urls) }, { merge: true });
 }
 
-export async function removeFromGallery(gallery: "mirror" | "cute", url: string): Promise<void> {
-  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
-  await setDoc(doc(db, "config", "galleries"), { [field]: arrayRemove(url) }, { merge: true });
-}
-
-export async function updateGalleryOrder(gallery: "mirror" | "cute", urls: string[]): Promise<void> {
-  const field = gallery === "mirror" ? "mirrorUrls" : "cuteUrls";
+export async function updateGalleryOrder(gallery: GalleryKey, urls: string[]): Promise<void> {
+  const field = GALLERIES[gallery].field;
   await setDoc(doc(db, "config", "galleries"), { [field]: urls }, { merge: true });
 }
-
