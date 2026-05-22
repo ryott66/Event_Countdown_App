@@ -116,7 +116,8 @@ const css = `
   .ec-info { padding: 0.45rem 0.6rem 0.6rem; }
   .ec-title {
     font-family: "Dancing Script", cursive; font-size: 0.95rem; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden; word-break: break-word; line-height: 1.2;
   }
   .ec-date { font-size: 0.7rem; color: var(--text-light); margin-top: 0.1rem; }
   .ec-memo {
