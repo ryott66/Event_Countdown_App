@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DndContext, closestCenter, PointerSensor, TouchSensor,
@@ -166,6 +166,60 @@ const css = `
     height: 15rem; border: 0.15rem solid rgb(128,128,128);
     border-radius: 0.6rem; object-fit: cover; display: block;
     scroll-snap-align: start; flex-shrink: 0;
+    cursor: zoom-in; transition: transform 0.2s ease;
+  }
+  .hp-gallery-img:hover { transform: scale(1.02); }
+
+  /* === Lightbox === */
+  .hp-lightbox {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.85);
+  }
+  .hp-lightbox-scroll {
+    width: 100%; height: 100%;
+    display: flex; overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .hp-lightbox-scroll::-webkit-scrollbar { display: none; }
+  .hp-lightbox-slide {
+    flex: 0 0 100%; height: 100%;
+    scroll-snap-align: center; scroll-snap-stop: always;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem; box-sizing: border-box;
+  }
+  .hp-lightbox-slide img {
+    max-width: 100%; max-height: 100%;
+    border-radius: 1rem; object-fit: contain;
+    box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  }
+  .hp-lightbox-close {
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    z-index: 1; border: none; background: rgba(255,255,255,0.95);
+    color: #333; font-size: 2rem; width: 3rem; height: 3rem;
+    border-radius: 50%; cursor: pointer; line-height: 1; padding: 0;
+  }
+  .hp-lightbox-close:hover { background: rgba(255,255,255,1); }
+  .hp-lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    z-index: 1; border: none; background: rgba(255,255,255,0.9);
+    color: #333; font-size: 2rem; width: 3rem; height: 3rem;
+    border-radius: 50%; cursor: pointer; line-height: 1; padding: 0;
+  }
+  .hp-lightbox-nav.prev { left: 0.75rem; }
+  .hp-lightbox-nav.next { right: 0.75rem; }
+  .hp-lightbox-nav:hover { background: rgba(255,255,255,1); }
+  .hp-lightbox-counter {
+    position: absolute; bottom: 0.75rem; left: 50%;
+    transform: translateX(-50%); z-index: 1;
+    color: #fff; font-size: 0.9rem; padding: 0.3rem 0.8rem;
+    background: rgba(0,0,0,0.4); border-radius: 1rem;
+    pointer-events: none;
+  }
+  @media (max-width: 767px) {
+    .hp-lightbox-nav { display: none; }
+    .hp-lightbox-slide { padding: 0.5rem; }
   }
 
   /* 編集モード */
@@ -274,12 +328,13 @@ function SortablePhoto({ url, onDelete }: { url: string; onDelete: () => void })
 }
 
 function GallerySection({
-  title, urls, gallery, isAdmin,
+  title, urls, gallery, isAdmin, onOpen,
 }: {
   title: string;
   urls: string[];
   gallery: GalleryKey;
   isAdmin: boolean;
+  onOpen: (urls: string[], index: number) => void;
 }) {
   const [editMode, setEditMode] = useState(false);
   const [localUrls, setLocalUrls] = useState<string[]>([]);
@@ -374,7 +429,15 @@ function GallerySection({
         ) : (
           <div className="hp-gallery-scroll">
             {displayUrls.map((src, i) => (
-              <img key={i} src={src} alt="" className="hp-gallery-img" loading="lazy" decoding="async" />
+              <img
+                key={i}
+                src={src}
+                alt=""
+                className="hp-gallery-img"
+                loading="lazy"
+                decoding="async"
+                onClick={() => onOpen(displayUrls, i)}
+              />
             ))}
           </div>
         )}
@@ -388,6 +451,9 @@ export default function HomePage() {
   const { events, loading } = useEvents();
   const { galleries } = useGalleries();
   const navigate = useNavigate();
+  const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+  const openLightbox = (urls: string[], index: number) => setLightbox({ urls, index });
+  const closeLightbox = () => setLightbox(null);
 
   // #rootの幅制限を外す
   useEffect(() => {
@@ -458,10 +524,96 @@ export default function HomePage() {
               urls={galleries[def.field] ?? []}
               gallery={key}
               isAdmin={isAdmin}
+              onOpen={openLightbox}
             />
           ))}
         </aside>
       </div>
+
+      {lightbox && (
+        <Lightbox urls={lightbox.urls} initialIndex={lightbox.index} onClose={closeLightbox} />
+      )}
+    </div>
+  );
+}
+
+function Lightbox({
+  urls, initialIndex, onClose,
+}: {
+  urls: string[];
+  initialIndex: number;
+  onClose: () => void;
+}) {
+  const [index, setIndex] = useState(initialIndex);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 初期表示: クリックされた写真にスクロール位置を合わせる
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({ left: el.clientWidth * initialIndex, behavior: "instant" as ScrollBehavior });
+  }, [initialIndex]);
+
+  const navigateBy = useCallback((delta: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setIndex((cur) => {
+      const next = Math.max(0, Math.min(urls.length - 1, cur + delta));
+      if (next === cur) return cur;
+      el.scrollTo({ left: el.clientWidth * next, behavior: "smooth" });
+      return next;
+    });
+  }, [urls.length]);
+
+  // ESC で閉じる / ←→ で前後移動 / 背景スクロールロック
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") navigateBy(-1);
+      else if (e.key === "ArrowRight") navigateBy(1);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [navigateBy, onClose]);
+
+  // スワイプ/スクロールに合わせて current index を追従
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const newIndex = Math.round(el.scrollLeft / el.clientWidth);
+    setIndex((cur) => (cur !== newIndex ? newIndex : cur));
+  };
+
+  return (
+    <div className="hp-lightbox" onClick={onClose} role="dialog" aria-modal="true">
+      <button type="button" className="hp-lightbox-close" onClick={onClose} aria-label="Close">×</button>
+      <div className="hp-lightbox-scroll" ref={scrollRef} onScroll={onScroll}>
+        {urls.map((url, i) => (
+          <div key={i} className="hp-lightbox-slide">
+            <img src={url} alt="" onClick={(e) => e.stopPropagation()} />
+          </div>
+        ))}
+      </div>
+      {index > 0 && (
+        <button
+          type="button" className="hp-lightbox-nav prev" aria-label="Previous"
+          onClick={(e) => { e.stopPropagation(); navigateBy(-1); }}
+        >‹</button>
+      )}
+      {index < urls.length - 1 && (
+        <button
+          type="button" className="hp-lightbox-nav next" aria-label="Next"
+          onClick={(e) => { e.stopPropagation(); navigateBy(1); }}
+        >›</button>
+      )}
+      {urls.length > 1 && (
+        <div className="hp-lightbox-counter">{index + 1} / {urls.length}</div>
+      )}
     </div>
   );
 }

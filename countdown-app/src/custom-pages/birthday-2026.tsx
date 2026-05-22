@@ -76,6 +76,7 @@ export default function Birthday2026({ event }: Props) {
   const cakeRef = useRef<HTMLElement>(null);
   const heartRef = useRef<HTMLElement>(null);
   const [winWidth, setWinWidth] = useState(() => window.innerWidth);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   // このページだけ #root の幅制限を外す
   useEffect(() => {
@@ -95,6 +96,21 @@ export default function Birthday2026({ event }: Props) {
   const isPortrait = winWidth < 768;
   const bookPageWidth = isPortrait ? Math.min(winWidth - 80, 250) : 400;
   const bookPageHeight = Math.round(bookPageWidth * 1.4);
+  const openLightbox = (url: string) => setLightboxUrl(url);
+  const closeLightbox = () => setLightboxUrl(null);
+
+  // ライトボックス表示中: ESCで閉じる + 背景スクロールをロック
+  useEffect(() => {
+    if (!lightboxUrl) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeLightbox(); };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [lightboxUrl]);
 
   // PCはReact_pageの設計を忠実に再現、モバイルは@mediaで上書き
   const css = `
@@ -256,7 +272,32 @@ export default function Birthday2026({ event }: Props) {
       scroll-snap-align: start;
       object-fit: cover; flex-shrink: 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: zoom-in;
+      transition: transform 0.2s ease;
     }
+    .b26-new-gallery img:hover { transform: scale(1.02); }
+
+    .b26-lightbox {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.85); display: flex;
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .b26-lightbox-inner {
+      position: relative; max-width: 95%; max-height: 95%;
+      width: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    .b26-lightbox-inner img {
+      max-width: 100%; max-height: 100%; border-radius: 1rem;
+      box-shadow: 0 0 40px rgba(0,0,0,0.4);
+    }
+    .b26-lightbox-close {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      z-index: 1; border: none; background: rgba(255,255,255,0.95);
+      color: #333; font-size: 2rem; width: 3rem; height: 3rem;
+      border-radius: 50%; cursor: pointer; line-height: 1; padding: 0;
+    }
+    .b26-lightbox-close:hover { background: rgba(255,255,255,1); }
 
     /* === Footer === */
     .b26-footer { height: 12rem; padding-top: 3rem; }
@@ -467,7 +508,25 @@ export default function Birthday2026({ event }: Props) {
         <div className="b26-new-memories">
           <h2 className="b26-memory-title">2026 Memories</h2>
           <div className="b26-new-gallery">
-            {event.imageUrls.map((url, i) => <img key={i} src={url} alt="" loading="lazy" decoding="async" />)}
+            {event.imageUrls.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                onClick={() => openLightbox(url)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {lightboxUrl && (
+        <div className="b26-lightbox" onClick={closeLightbox} role="dialog" aria-modal="true">
+          <div className="b26-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="b26-lightbox-close" onClick={closeLightbox} aria-label="Close">×</button>
+            <img src={lightboxUrl} alt="Expanded memory" />
           </div>
         </div>
       )}
