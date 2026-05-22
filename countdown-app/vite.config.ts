@@ -12,6 +12,20 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        // HTMLナビゲーションはネットワーク優先で取得し、デプロイ直後でも
+        // 必ず最新の index.html → 最新の JS ハッシュ を参照させる。
+        // ネットワーク不通時のみキャッシュ（オフライン用フォールバック）。
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-pages",
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 10 },
+            },
+          },
+        ],
       },
       manifest: {
         name: "Our Countdown",
