@@ -18,9 +18,11 @@ export default function EventCard({ event, isPast }: Props) {
   const navigate = useNavigate();
   const days = daysUntil(event.date);
 
+  const isToday = days === 0 && !isPast;
+
   return (
     <div
-      className="ec-card"
+      className={isToday ? "ec-card ec-card-today" : "ec-card"}
       style={{ opacity: isPast ? 0.5 : 1 }}
       onClick={() => navigate(`/events/${event.id}`)}
     >

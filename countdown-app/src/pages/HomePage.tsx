@@ -97,6 +97,47 @@ const css = `
     transition: transform 0.15s;
   }
   .ec-card:hover { transform: translateY(-3px); }
+
+  /* 当日カード: 枠に光点を散らした静的キラキラ + ふんわり明滅 */
+  .ec-card-today {
+    position: relative;
+    box-shadow: 0 4px 18px rgba(230, 138, 182, 0.22);
+  }
+  .ec-card-today::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 3.5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      rgba(230, 138, 182, 0.55) 0%,
+      #ffffff 7%,
+      rgba(230, 138, 182, 0.55) 14%,
+      rgba(230, 138, 182, 0.45) 23%,
+      #ffe4ef 30%,
+      rgba(230, 138, 182, 0.45) 37%,
+      rgba(230, 138, 182, 0.55) 48%,
+      #ffffff 55%,
+      rgba(230, 138, 182, 0.55) 62%,
+      rgba(230, 138, 182, 0.45) 73%,
+      #ffe4ef 80%,
+      rgba(230, 138, 182, 0.45) 87%,
+      rgba(230, 138, 182, 0.55) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: ec-today-twinkle 2.6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes ec-today-twinkle {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; }
+  }
   .ec-media { width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; }
   .ec-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
   .ec-emoji-bg {
@@ -128,7 +169,7 @@ const css = `
   .ec-countdown { margin-top: 0.2rem; text-align: right; }
   .ec-days { font-family: "Dancing Script", cursive; font-size: 1.2rem; color: var(--pink); line-height: 1; }
   .ec-days-label { font-size: 0.6rem; color: var(--text-light); }
-  .ec-today { color: var(--pink); font-family: "Dancing Script", cursive; font-size: 0.9rem; }
+  .ec-today { color: var(--pink); font-family: "Dancing Script", cursive; font-size: 1.7rem; line-height: 1; }
   .ec-past-days { color: var(--text-light); font-size: 0.7rem; }
 
   /* === Memories === */
@@ -284,6 +325,7 @@ const css = `
     .hp-cards { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; }
     .ec-title { font-size: 0.9rem; }
     .ec-days { font-size: 1.15rem; }
+    .ec-today { font-size: 1.55rem; }
     .ec-info { padding: 0.35rem 0.5rem 0.5rem; }
     .ec-emoji-bg { font-size: 1.8rem; }
 

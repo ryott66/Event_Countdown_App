@@ -70,9 +70,9 @@ function TemplateDetail({ event }: { event: Event }) {
   useEffect(() => {
     if (!isToday) return;
     const fire = () => confetti({ particleCount: 80, spread: 70, colors: [...theme.confettiColors], origin: { y: 0.6 } });
-    fire();
-    const id = setInterval(fire, 3000);
-    return () => clearInterval(id);
+    fire(); // 1回目: ページ表示直後
+    const id = window.setTimeout(fire, 3000); // 2回目: 3秒後で打ち止め
+    return () => window.clearTimeout(id);
   }, [isToday]);
 
   return (
