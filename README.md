@@ -1,153 +1,198 @@
-# countdown-app 引き継ぎドキュメント
+# Our Countdown
 
-> Claude Code に渡す引き継ぎ用ドキュメントです。
-> Cowork（デスクトップ版Claude）での設計会話をもとに作成しました。
-> **このファイルを読んでから実装を始めてください。**
+二人専用のイベントカウントダウン Web アプリ。
 
----
+イベントを登録すると残り日数をカウントダウン表示し、特別な日には Reactで自作したカスタムページに切り替えられる。誕生日サプライズなど「手で作った特別なページ」と「日々のイベント管理」を共存させるためのアプリ。
 
-## プロジェクト概要
-
-**何を作るか：** 二人専用のイベントカウントダウンアプリ
-
-**背景：**
-- りょうさんが彼女Reminaさんへの誕生日サプライズとして毎年Webで何かを作っている
-- 昨年（2025年）は誕生日カウントダウンページを作成・GitHub Pagesで公開（`ryott66.github.io/React_Page/`）
-- 今年（2026年）は「一つのイベントだけでなく、様々なイベントを登録・管理できるアプリ」として発展させる
-- Reminaさんの誕生日は **6月28日**（2026年は23歳）
-
-**重要な価値観（実装時に常に意識すること）：**
-> 「普通の世の中に存在するアプリではなく、私がいちいちコーディングして専用のページが出来上がるという良さがある」
-
-つまりこのアプリは、汎用的なカウントダウンツールではなく、「りょうさんが手で作った、二人だけのもの」という質感を大切にして作ること。コードの随所にそのセンスが出るようにする。
+**公開URL**: <https://ryott66.github.io/Event_Countdown_App/>
 
 ---
 
 ## 技術スタック
 
 | 役割 | 技術 |
-|------|------|
-| フロントエンド | React + TypeScript + Vite |
-| ルーティング | React Router v6 |
+|---|---|
+| フロントエンド | React 19 + TypeScript + Vite |
+| ルーティング | React Router v7 (HashRouter) |
 | 認証 | Firebase Authentication（Googleログイン） |
 | DB | Cloud Firestore |
 | 画像ストレージ | Firebase Storage |
-| デプロイ | GitHub Pages（`gh-pages`パッケージ） |
+| ホスティング | GitHub Pages（`gh-pages` パッケージ） |
 | PWA | `vite-plugin-pwa`（ホーム画面追加対応） |
-
-**既存のReact_Pageリポジトリとの関係：**
-- 完全に**別リポジトリ・別URL**で独立して作る
-- 既存ページ（`ryott66.github.io/React_Page/`）はそのまま触らず残す
-- ただし既存ページのCSSや実装（confettiなど）は参考・流用してよい
-
----
-
-## 認証設計
-
-### 管理者モード（りょうさん）
-- Googleアカウントでログイン
-- イベントの作成・編集・削除・閲覧すべて可能
-
-### 閲覧モード（Reminaさん）
-- **シークレットURL方式**：URLにキーを埋め込む
-  ```
-  https://ryott66.github.io/countdown-app/?key=XXXX
-  ```
-- このURLを知っていればGoogleログイン不要で閲覧できる
-- 作成・編集・削除は不可（読み取り専用）
-- ReminaさんにはこのURLをリリース時にLINEで一度送るだけでよい
-
-**実装方針：**
-- キーは Firestore の `config/guestKey` ドキュメントで管理（りょうさんがアプリ内から変更できるようにしておく）
-- URLパラメータのキーと Firestore のキーを照合して認証状態を決定
-- キーが一致すれば `isGuest: true` のコンテキストを付与
-
----
-
-## アクセス制御
-- Firestoreのセキュリティルール：認証済みユーザー（Google）またはゲストキー検証済みのみ読み取り可
-- ゲストキー検証はクライアントサイドで行う（サーバーレス設計のため）
-- 許可するGoogleアカウントは Firestore ルールで特定のメールアドレス2件に絞る
+| 装飾 | `canvas-confetti`、`react-pageflip` |
 
 ---
 
 ## 画面構成
 
 ```
-① ログイン画面
-    ├── Googleログインボタン（管理者用）
-    └── または シークレットURLで自動ログイン（ゲスト用）
-
-② イベント一覧（ホーム）
-    ├── ヘッダー：「Our Events」 + 追加ボタン（管理者のみ表示）
-    ├── セクション「これから」：残り日数順に並んだイベントカード
-    │     └── カード：絵文字 ＋ タイトル ＋ 残り日数（大きく）＋ 日付
-    └── セクション「過去」：終了済みイベント（薄く表示）
-
-③ イベント詳細（カウントダウン）
-    ├── 戻るボタン
-    ├── 絵文字 ＋ イベント名 ＋ 日付
-    ├── 日・時・分・秒 のライブカウントダウン
-    ├── メモ表示
-    ├── 画像ギャラリー（横スクロール）
-    └── 当日：confetti爆発 ＋ お祝いメッセージ
-
-④ イベント追加・編集フォーム（管理者のみ）
-    ├── タイトル（必須）
-    ├── 日付（必須）
-    ├── 絵文字選択（必須）
-    ├── テーマ選択（必須）→ 詳細は後述
-    ├── メモ（任意）
-    ├── 画像アップロード（複数枚・任意）
-    └── カスタムページ設定（任意）→ 詳細は後述
+① LoginPage             未ログイン & ゲストキー不一致時に表示
+② HomePage              イベント一覧 + 共有ギャラリー（Memories）
+③ EventDetailPage       テンプレート方式 or カスタムページ
+④ EventFormPage         イベント追加・編集（管理者のみ）
 ```
+
+イベント詳細は **テンプレート方式** と **カスタムページ方式** のハイブリッド。テンプレートはテーマ（birthday / travel / anniversary / date）を選ぶだけで完成。特別なイベント用に React コンポーネントを自分で書いて差し込むこともできる（後述）。
 
 ---
 
-## イベント詳細ページ：ハイブリッド方式
+## 認証システム
 
-このアプリ最大の特徴。2つのモードを共存させる。
+ユーザー状態は4種類（[src/contexts/AuthContext.tsx](countdown-app/src/contexts/AuthContext.tsx)）。
+
+| state | 条件 | 表示される画面 |
+|---|---|---|
+| `loading` | 初期認証チェック中 | ローディング |
+| `admin` | Googleログイン済み **かつ** 管理者UIDリストに登録あり | 全機能（閲覧＋編集＋追加） |
+| `guest` | 未ログイン **かつ** URL `?key=xxx` がFirestoreの `config/guestKey.key` と一致 | 閲覧のみ |
+| `unauthorized` | 上記いずれでもない | LoginPage |
+
+### 認証フロー
+1. 起動時に `onAuthStateChanged` をリッスン
+2. Firebaseユーザーが居る → `VITE_ADMIN_UIDS` に含まれれば `admin`、無ければ即 `signOut()` して `unauthorized`
+3. Firebaseユーザーが居ない → URLの `?key=` を Firestore と照合、一致なら `guest`、無ければ `unauthorized`
+
+### 管理者を追加する
+新しい管理者を追加する場合：
+
+1. 該当のGoogleアカウントで一度ログインを試みる（このとき unauthorized で弾かれてOK）
+2. [Firebase Console](https://console.firebase.google.com/) → Authentication → Users で **UID** をコピー
+3. [`countdown-app/.env`](countdown-app/.env) の `VITE_ADMIN_UIDS` にカンマ区切りで追加
+   ```
+   VITE_ADMIN_UIDS=既存UID,新しいUID
+   ```
+4. [`countdown-app/firestore.rules`](countdown-app/firestore.rules) と [`countdown-app/storage.rules`](countdown-app/storage.rules) の `isAdmin()` のリストにも同じUIDを追加
+5. Firebase Console でルールを再公開
+6. 再ビルド・再デプロイ（`npm run deploy`）
+
+### ゲストアクセス
+閲覧用URL：
+
+```
+https://ryott66.github.io/Event_Countdown_App/?key=XXXX
+```
+
+このURLを共有された人はGoogleログイン不要で閲覧できる。作成・編集・削除は不可。キー文字列は Firestore の `config/guestKey` ドキュメントで管理。
+
+---
+
+## Firebase設定
+
+### Firebase Consoleでやる初期設定
+1. **Authentication** → サインイン方法 → **Google** を有効化
+2. **Firestore Database** → データベース作成（リージョン: `asia-northeast1`）
+3. **Storage** → Storageバケット作成（同リージョン）
+4. プロジェクト設定 → 全般 → ウェブアプリ追加 → 表示された設定値を `.env` にコピー
+
+### セキュリティルールのデプロイ
+リポジトリ内のルールファイル：
+- [`countdown-app/firestore.rules`](countdown-app/firestore.rules)
+- [`countdown-app/storage.rules`](countdown-app/storage.rules)
+
+現状は Firebase Console で手動コピペでデプロイする運用：
+1. Console → Firestore Database → ルール → ファイル内容を貼り付け → 公開
+2. Console → Storage → ルール → ファイル内容を貼り付け → 公開
+
+ルール変更時は両方デプロイすること。`firestore.rules` と `storage.rules` の管理者UIDリストは同期させる必要がある。
+
+### 環境変数（.env）
+`.env` は Git管理外。新規環境では以下を用意する：
+
+```
+VITE_FIREBASE_API_KEY=xxxx
+VITE_FIREBASE_AUTH_DOMAIN=xxxx.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=xxxx
+VITE_FIREBASE_STORAGE_BUCKET=xxxx.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=xxxx
+VITE_FIREBASE_APP_ID=xxxx
+VITE_ADMIN_UIDS=uid1,uid2
+```
+
+Firebase設定値はConsole「プロジェクト設定」から取得可能。Vite規約で `VITE_` プレフィックス必須。
+
+---
+
+## イベント詳細ページのカスタマイズ
+
+このアプリ最大の特徴。テンプレートで簡単に作るか、自分で1ページを書くか選べる。
 
 ### A. テンプレート方式（通常）
-- テーマを選ぶだけでデザインが決まる
-- アプリ内で完結、コーディング不要
-- 用意するテーマ（最低限）：
 
-| テーマ | 用途 | カラー | 演出 |
-|--------|------|--------|------|
-| `birthday` | 誕生日 | ピンク系 | confetti |
-| `travel` | 旅行・旅 | 青空系 | confetti |
-| `anniversary` | 記念日 | ボルドー系 | confetti |
-| `date` | デート・食事 | オレンジ系 | confetti |
+テーマを選ぶだけでデザインが決まる。アプリ内のフォームで完結。
+
+| テーマ | 用途 | カラー |
+|---|---|---|
+| `birthday` | 誕生日 | ピンク |
+| `travel` | 旅行 | 青空 |
+| `anniversary` | 記念日 | ボルドー |
+| `date` | デート | オレンジ |
+
+カラー・confetti色などは [src/constants/themes.ts](countdown-app/src/constants/themes.ts) で一元定義。テーマを追加するときはこのファイルに1セット追加するだけで EventFormPage / EventDetailPage 両方に反映される。
 
 ### B. カスタムページ方式（特別なイベント用）
-- りょうさんが自分でReactコンポーネントを書いて紐付ける
-- 既存の誕生日ページのような自由な演出・レイアウトが可能
-- `src/custom-pages/` フォルダに配置する
 
-```
-src/
-  custom-pages/
-    birthday-2026.tsx    ← 今年の誕生日用（りょうさんが書く）
-    trip-summer-2026.tsx ← 夏旅行用（後で作る）
-```
+`src/custom-pages/` にReactコンポーネントを配置して紐付ける。テンプレートでは表現しきれない演出やレイアウトに使う。
 
-- Firestoreのイベントデータに `useCustomPage: true` と `customPageKey: "birthday-2026"` を持たせる
-- カスタムコンポーネントには `event` オブジェクトがpropsで渡ってくる（タイトル・日付・画像URLなどを再利用可能）
+#### 実装手順
 
+**1. コンポーネントを作る**
 ```tsx
-// EventDetail.tsx のルーティングイメージ
-if (event.useCustomPage) {
-  const CustomPage = customPageRegistry[event.customPageKey];
-  return <CustomPage event={event} />;
-} else {
-  return <TemplateDetail event={event} />;
+// src/custom-pages/trip-summer-2026.tsx
+import type { Event } from "../types";
+
+interface Props {
+  event: Event;
+}
+
+export default function TripSummer2026({ event }: Props) {
+  // 自由にJSX/CSS/JSロジックを書く
+  return <div>...</div>;
 }
 ```
 
+`event` propsには Firestore の全フィールド（`title` / `date` / `imageUrls` 等）が入ってくる。管理者がアプリ内でアップロードした写真もここから参照可能。
+
+**2. レジストリに登録**
+```ts
+// src/custom-pages/index.ts
+export const customPageRegistry = {
+  "birthday-2026": lazy(() => import("./birthday-2026")),
+  "trip-summer-2026": lazy(() => import("./trip-summer-2026")), // 追加
+};
+```
+
+`lazy()` で囲うことで各カスタムページが個別チャンクに分割され、必要なときだけダウンロードされる。
+
+**3. Firestoreでイベントを設定**
+EventFormPage（イベント追加・編集画面）で：
+- 「カスタムページを使う」をオン
+- 「カスタムページキー」に `trip-summer-2026` を入力（レジストリのキーと一致させる）
+
+EventDetailPage が `useCustomPage` と `customPageKey` を見て、テンプレートではなくカスタムページにルーティングする（[EventDetailPage.tsx:180-183](countdown-app/src/pages/EventDetailPage.tsx#L180-L183)）。
+
+#### 既存のサンプル
+[src/custom-pages/birthday-2026.tsx](countdown-app/src/custom-pages/birthday-2026.tsx) が動作例。HTMLFlipBook（本めくり）、横スクロールギャラリー、ライトボックスなど一通り入っている。
+
+#### カスタムページに必要なFirebase設定
+特になし。**既存の Firestore イベントドキュメントを利用するだけ**で、新たなコレクションやセキュリティルール変更は不要。
+
+画像を追加で使いたい場合は2通り：
+- `imageUrls` フィールド経由（管理者がアプリ内でアップロード → Storage に保存）
+- `countdown-app/public/images/` 配下に静的ファイルとして配置（ビルドで配信、SW precache対象）
+
 ---
 
-## Firestoreデータ構造
+## 共有ギャラリー（Memories）
+
+Homeページ下部の「Mirror Moments」「Cutest Moments」は**イベントに紐づかない共有写真集**。
+
+- Firestore `config/galleries` ドキュメントに `mirrorUrls: string[]` `cuteUrls: string[]` として保存
+- Firebase Storage 上は `events/galleries/{galleryKey}/...` に格納
+- 新しいギャラリー種別を増やすには [src/constants/galleries.ts](countdown-app/src/constants/galleries.ts) に1行追加するだけで HomePage に自動反映
+
+---
+
+## Firestore データ構造
 
 ```
 /events/{eventId}
@@ -156,6 +201,7 @@ if (event.useCustomPage) {
   emoji: string           // "🎂"
   theme: string           // "birthday" | "travel" | "anniversary" | "date"
   memo: string            // 任意
+  iconUrl: string         // イベントカード用アイコン画像
   imageUrls: string[]     // Firebase Storage の URL 配列（複数枚）
   useCustomPage: boolean  // false がデフォルト
   customPageKey: string   // useCustomPage=true のときのみ使用
@@ -165,111 +211,97 @@ if (event.useCustomPage) {
 
 /config/guestKey
   key: string             // シークレットURLのキー文字列
+
+/config/galleries
+  mirrorUrls: string[]    // Mirror Moments の写真URL一覧
+  cuteUrls: string[]      // Cutest Moments の写真URL一覧
+```
+
+---
+
+## デプロイ
+
+```bash
+cd countdown-app
+npm run deploy
+```
+
+`predeploy` で `npm run build` が走り、`gh-pages -d dist` で GitHub Pages に push される。
+
+### PWA（ホーム画面追加）
+- `vite-plugin-pwa` で manifest と Service Worker を自動生成（[vite.config.ts](countdown-app/vite.config.ts)）
+- HTML は **NetworkFirst** 戦略でキャッシュ（デプロイ後すぐに最新版が反映されるように）
+- JS/CSS/画像は precache（ファイル名にハッシュが入るので入れ替わる）
+- 既存のPWAは新SWがアクティブ化されるまで古い版を表示することがある（数秒〜数分のタイムラグ）
+
+### デプロイ後の確認
+- 新機能・新ページが反映されているか
+- PWA起動時に白画面期間が発生しないか
+- 認証関連を変更した場合は、admin / guest / unauthorized 各状態で動作確認
+
+---
+
+## プロジェクト構成
+
+```
+countdown-app/
+├── public/              # 静的アセット（ビルドでそのまま配信）
+│   ├── images/          # 内蔵画像（カスタムページから参照）
+│   ├── icon-192.png     # PWAアイコン
+│   ├── icon-512.png
+│   └── favicon.svg
+├── src/
+│   ├── components/      # EventCard など共通UI
+│   ├── constants/       # themes, galleries の定義
+│   ├── contexts/        # AuthContext（認証状態）
+│   ├── custom-pages/    # ★イベント詳細のカスタムページ
+│   │   ├── index.ts     #   レジストリ
+│   │   └── birthday-2026.tsx
+│   ├── hooks/           # useEvents, useEvent, useGalleries
+│   ├── lib/             # firebase.ts, eventService.ts, imageCompression.ts
+│   ├── pages/           # HomePage, EventDetailPage, EventFormPage, LoginPage
+│   ├── types/           # 型定義
+│   ├── App.tsx          # ルーティング
+│   └── main.tsx         # エントリポイント
+├── firestore.rules      # Firestore セキュリティルール
+├── storage.rules        # Storage セキュリティルール
+├── vite.config.ts       # Vite + PWA設定
+└── .env                 # 環境変数（Git管理外）
 ```
 
 ---
 
 ## デザイン方針
 
-既存の `React_Page` のCSSを継承・踏襲すること。
+- ベース背景：淡いピンク（`#fff0f5`）
+- アクセントカラー：ピンク（`#e68ab6`）
+- タイトル系フォント：`Dancing Script`（Googleフォント）
+- ヘッダー：`rgba(207, 220, 231, 0.4)` の半透明
+- レスポンシブ：`clamp()` で `html font-size` を制御
+- 当日演出：`canvas-confetti` で爆発
 
-```css
-/* 既存ページの主要スタイル値 */
-background-color: #fff0f5;           /* ベース背景：淡いピンク */
-font-family: 'Dancing Script', cursive; /* 見出し・タイトル */
-color: #e68ab6;                      /* アクセントカラー（ピンク）*/
-background-color: rgba(207, 220, 231, 0.4); /* ヘッダー */
-color: rgb(200, 247, 255);           /* カウントダウン数字 */
-```
-
-- `Dancing Script`（Googleフォント）を必ず使う
-- confettiは `canvas-confetti` パッケージ（既存と同じ）
-- レスポンシブ対応：既存と同様に `clamp()` で `html font-size` を制御
+「汎用カウントダウンツール」ではなく、コードに手作り感が滲むことを優先する。テンプレート方式だけでなくカスタムページ方式を残しているのもこのため。
 
 ---
 
-## 拡張性のための設計方針
+## セキュリティに関する注意
 
-将来追加する可能性があるので、最初から設計に織り込んでおく：
+- **クライアントだけでは完全な秘匿はできない**。Firebase Web SDKの設計上、API KeyやFirebase設定値はビルド後のJSバンドルに公開される
+- 本物のアクセス制御は **Firestore / Storage Security Rules** で行うこと。UI側の `isAdmin` チェックは見た目だけ
+- `config/guestKey` は現状クライアントから読める仕様（読まないと照合できないため）。本気で秘匿したい場合は Cloud Functions 経由での照合に切り替える必要あり
+- 管理者UIDが漏れても直ちに突破口にはならないが、Googleアカウント自体のセキュリティ（2段階認証）は前提
+
+---
+
+## 拡張アイデア
+
+将来追加するときの取っ掛かり：
 
 - **コメント機能**：`/events/{eventId}/comments` サブコレクション
 - **リアクション**：イベントへのハート・スタンプ
 - **繰り返しイベント**：毎年の記念日（`recurring: boolean` フィールドを予約）
 - **プッシュ通知**：イベント1週間前にお知らせ（PWA + Firebase Cloud Messaging）
 - **カレンダービュー**：一覧の表示切り替え
+- **画像サムネイル別途生成**：ギャラリー用の小サイズ画像をアップロード時に同時保存して初回ロード高速化
 
-コンポーネント・hooks・Firebase操作は必ず分離すること（ビジネスロジックをUIに直書きしない）。
-
----
-
-## 実装ステップ（推奨順）
-
-```
-Step 1: Firebaseプロジェクト確認（コンソールで設定済みのはず）
-          └ Authentication（Google有効化）
-          └ Firestore（asia-northeast1）
-          └ Storage
-
-Step 2: Viteプロジェクト作成
-          npm create vite@latest countdown-app -- --template react-ts
-
-Step 3: 依存パッケージインストール
-          firebase
-          react-router-dom
-          canvas-confetti + @types/canvas-confetti
-          vite-plugin-pwa
-
-Step 4: Firebase設定・環境変数（.env）
-
-Step 5: 認証（Google + ゲストキー）
-
-Step 6: Firestoreフック（useEvents, useEvent）
-
-Step 7: イベント一覧ページ
-
-Step 8: イベント追加・編集フォーム + Storageアップロード
-
-Step 9: テンプレート詳細ページ（テーマ4種）
-
-Step 10: カスタムページ基盤（registry + birthday-2026.tsx の雛形）
-
-Step 11: PWA設定（manifest, icon）
-
-Step 12: GitHub Pagesデプロイ設定
-```
-
----
-
-## りょうさんの要望・スタンス（暗黙の要件）
-
-- **コードを理解しながら進めたい**：実装の都度、なぜそう書くかを簡潔に説明すること
-- **拡張性を意識**：「後でこうできる」という設計の理由も伝えること
-- **手作り感を大切に**：テンプレート方式だけでなく、自分でコードを書けるカスタム方式を残したのはこのため。実装は「コピペで動くだけ」ではなく、りょうさんが後から自分で手を入れられるコードにする
-- **Remina への驚き**：完成物はReminaさんへのサプライズ。ロマンチックで温かみのある仕上がりを意識する
-- **既存ページのリファクタリング**も将来的にやりたい（今回は対象外だが、既存コードの構造を把握しておくと後で役立つ）
-
----
-
-## 参考：既存ページの構成
-
-```
-React_page/
-  src/
-    components/
-      Header.tsx        ← fixed header, スムーズスクロール実装済み
-      MainSection.tsx   ← カウントダウンロジック（流用可）
-      BookSection.tsx   ← react-pageflip 使用
-      Memories.tsx      ← 横スクロールギャラリー（流用可）
-      TripSection.tsx
-      Footer.tsx
-    utils/
-      handleButtonClick.ts
-    index.css           ← デザイントークン参照元
-```
-
-`MainSection.tsx` のカウントダウンロジックと `canvas-confetti` の使い方は流用推奨。
-
----
-
-*このドキュメントはCowork（デスクトップ版Claude）での設計セッションをもとに生成されました。*
-*作成日：2026-05-12*
+コンポーネント・hooks・Firebase操作は分離する方針（ビジネスロジックをUIに直書きしない）。
