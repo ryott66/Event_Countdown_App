@@ -430,13 +430,10 @@ function GallerySection({
         ) : (
           <div className="hp-gallery-scroll">
             {displayUrls.map((src, i) => (
-              <img
+              <LazyGalleryImg
                 key={i}
                 src={src}
-                alt=""
-                className="hp-gallery-img"
-                loading="lazy"
-                decoding="async"
+                index={i}
                 onClick={() => onOpen(displayUrls, i)}
               />
             ))}
@@ -535,6 +532,63 @@ export default function HomePage() {
         <Lightbox urls={lightbox.urls} initialIndex={lightbox.index} onClose={closeLightbox} />
       )}
     </div>
+  );
+}
+
+// 画面内 + 300px手前まで来たときに初めて src を設定する遅延読み込み画像
+// loading="lazy" は横スクロール内のオフスクリーン項目に効きにくいため自前で実装
+// viewBox 3:4 ≒ スマホ縦写真の典型比率にして、実画像との横シフトを抑える
+const LAZY_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 4'%3E%3C/svg%3E";
+
+function LazyGalleryImg({
+  src, onClick, index,
+}: {
+  src: string;
+  onClick: () => void;
+  index: number;
+}) {
+  const ref = useRef<HTMLImageElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    if (shouldLoad) return;
+    const el = ref.current;
+    if (!el) return;
+
+    // 1) 可視 or 近接ならすぐ読み込み（スクロールに追従）
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShouldLoad(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    io.observe(el);
+
+    // 2) バックグラウンドで段階的にプリフェッチ
+    //    画面外の写真も時間差で先読みしておき、スクロール時のラグを抑える
+    const prefetchDelay = 600 + index * 80;
+    const timer = window.setTimeout(() => setShouldLoad(true), prefetchDelay);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, [shouldLoad, index]);
+
+  return (
+    <img
+      ref={ref}
+      src={shouldLoad ? src : LAZY_PLACEHOLDER}
+      alt=""
+      className="hp-gallery-img"
+      decoding="async"
+      onClick={onClick}
+      style={shouldLoad ? undefined : { background: "rgba(230,138,182,0.12)" }}
+    />
   );
 }
 
