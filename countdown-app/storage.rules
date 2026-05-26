@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // === 管理者UIDリスト（Firestore と同じ）===
+    function isAdmin() {
+      return request.auth != null && request.auth.uid in [
+        'XKLcoqNyiogQjyhw8KihRFDKNIL2',
+        // 'HER_UID_HERE',
+      ];
+    }
+
+    // === events 配下の画像 ===
+    // - イベントアイコン: events/{eventId}/{filename}
+    // - ギャラリー写真: events/galleries/{galleryKey}/{filename}
+    //   （eventService.ts の uploadImage が "events/" prefix で保存している）
+    match /events/{eventId}/{allPaths=**} {
+      allow read: if true;
+      // 書き込みは admin のみ + 5MB 以下の画像のみ
+      allow write: if isAdmin()
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      // 削除も admin のみ
+      allow delete: if isAdmin();
+    }
+
+    // === それ以外: 管理者のみ ===
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
