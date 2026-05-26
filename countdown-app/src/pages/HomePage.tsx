@@ -14,6 +14,7 @@ import { useGalleries } from "../hooks/useGalleries";
 import { uploadImage, addToGallery, updateGalleryOrder } from "../lib/eventService";
 import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import EventCard from "../components/EventCard";
+import TogetherCounter from "../components/TogetherCounter";
 
 const css = `
   html { font-size: clamp(2px, 1.25vw, 16px); }
@@ -21,34 +22,38 @@ const css = `
 
   /* === Header === */
   .hp-header {
-    height: 3.5rem; width: 100%;
+    height: 4rem; width: 100%;
     background-color: rgba(207,220,231,0.45);
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; padding: 0 1.2rem; gap: 0.8rem;
     backdrop-filter: blur(8px);
   }
+  .hp-logo-wrap {
+    flex: 1; display: flex; align-items: center; gap: 0.8rem; min-width: 0;
+  }
   .hp-logo {
     font-family: "Dancing Script", cursive;
-    font-size: 2.3rem; color: var(--pink); flex: 1;
+    font-size: 2.5rem; color: var(--pink);
+    white-space: nowrap;
   }
   .hp-nav-btn {
-    font-size: 1.1rem; font-family: "Dancing Script", cursive;
-    padding: 0.35rem 1rem;
+    font-size: 1.2rem; font-family: "Dancing Script", cursive;
+    padding: 0.45rem 1.15rem;
     background-color: rgba(229,166,220,0.7); color: #fff;
-    border-radius: 0.6rem; box-shadow: 0 0.15rem #cbcbcb;
+    border-radius: 0.65rem; box-shadow: 0 0.15rem #cbcbcb;
     border: none; cursor: pointer; white-space: nowrap;
   }
   .hp-nav-btn:active { position: relative; top: 0.15rem; box-shadow: none; }
   .hp-nav-btn:hover { background-color: rgba(229,166,220,0.85); }
   .hp-icon-btn {
     background: var(--pink); color: #fff;
-    border-radius: 50%; width: 2rem; height: 2rem;
-    font-size: 1.1rem; line-height: 1; flex-shrink: 0;
+    border-radius: 50%; width: 2.3rem; height: 2.3rem;
+    font-size: 1.25rem; line-height: 1; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0.15rem #cbcbcb; border: none; cursor: pointer;
   }
   .hp-logout-btn {
-    background: none; color: var(--text-light); font-size: 0.85rem;
+    background: none; color: var(--text-light); font-size: 0.95rem;
     white-space: nowrap; border: none; cursor: pointer;
   }
 
@@ -66,7 +71,7 @@ const css = `
     background-color: #f9f0d7;
     border-radius: 1rem;
     padding: 1rem 1rem 1.5rem;
-    position: sticky; top: 4.5rem;
+    position: sticky; top: 5rem;
     min-width: 0;
     box-shadow: 0 4px 18px rgba(180,150,80,0.12);
   }
@@ -308,13 +313,14 @@ const css = `
   @media (max-width: 767px) {
     html { font-size: 13px; }
     .hp-header {
-      height: auto; padding: 0.5rem 0.7rem; gap: 0.4rem;
+      height: auto; padding: 0.6rem 0.8rem; gap: 0.45rem;
       flex-wrap: wrap;
     }
-    .hp-logo { font-size: 1.9rem; }
-    .hp-nav-btn { font-size: 0.95rem; padding: 0.3rem 0.7rem; border-radius: 0.5rem; }
-    .hp-icon-btn { width: 1.9rem; height: 1.9rem; font-size: 1rem; }
-    .hp-logout-btn { font-size: 0.8rem; }
+    .hp-logo-wrap { gap: 0.55rem; }
+    .hp-logo { font-size: 2.05rem; }
+    .hp-nav-btn { font-size: 1.05rem; padding: 0.38rem 0.85rem; border-radius: 0.55rem; }
+    .hp-icon-btn { width: 2.1rem; height: 2.1rem; font-size: 1.1rem; }
+    .hp-logout-btn { font-size: 0.88rem; }
 
     .hp-main { padding: 0.8rem 0.8rem 2rem; gap: 1.2rem; }
     .hp-memories-section { padding: 0.7rem 0.7rem 1rem; border-radius: 0.7rem; }
@@ -339,6 +345,17 @@ const css = `
     .hp-edit-grid { gap: 0.35rem; padding: 0.5rem 0.3rem; }
     .hp-delete-badge { width: 1.3rem; height: 1.3rem; font-size: 0.8rem; line-height: 1.3rem; }
     .hp-gallery-empty { font-size: 0.85rem; padding: 1rem 0.5rem; }
+  }
+
+  /* === Narrow phones (iPhone SE etc.) === */
+  /* ヘッダーを1行に収めるため、ボタンとロゴをもう一段コンパクトに */
+  @media (max-width: 480px) {
+    .hp-header { padding: 0.5rem 0.55rem; gap: 0.35rem; }
+    .hp-logo-wrap { gap: 0.4rem; }
+    .hp-logo { font-size: 1.7rem; }
+    .hp-nav-btn { font-size: 0.9rem; padding: 0.3rem 0.65rem; border-radius: 0.5rem; }
+    .hp-icon-btn { width: 1.85rem; height: 1.85rem; font-size: 0.95rem; }
+    .hp-logout-btn { font-size: 0.78rem; }
   }
 `;
 
@@ -516,7 +533,10 @@ export default function HomePage() {
       <style>{css}</style>
 
       <header className="hp-header">
-        <span className="hp-logo">Our Home</span>
+        <div className="hp-logo-wrap">
+          <span className="hp-logo">Our Home</span>
+          <TogetherCounter />
+        </div>
         <button className="hp-nav-btn" onClick={() => scrollTo("hp-events")}>Events</button>
         <button className="hp-nav-btn" onClick={() => scrollTo("hp-galleries")}>Memories</button>
         {isAdmin && (
