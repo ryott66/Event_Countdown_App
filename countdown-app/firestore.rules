@@ -4,7 +4,6 @@ service cloud.firestore {
 
     // === 管理者UIDリスト ===
     // .env の VITE_ADMIN_UIDS と同じUIDを並べる
-    // 彼女のUIDも、ログイン後にコンソールで確認して追加すること
     function isAdmin() {
       return request.auth != null && request.auth.uid in [
         'XKLcoqNyiogQjyhw8KihRFDKNIL2',
@@ -12,29 +11,24 @@ service cloud.firestore {
       ];
     }
 
-    // === ゲストキー ===
-    // クライアント側で照合するため read true (.envへ移行すれば false に絞れる)
     match /config/guestKey {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // === ギャラリーURL一覧 ===
     match /config/galleries {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // === イベント ===
     match /events/{eventId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // === それ以外: 管理者のみ ===
-    // 今後新しいコレクションを作っても無条件開放されないように
     match /{document=**} {
       allow read, write: if isAdmin();
     }
   }
 }
+
