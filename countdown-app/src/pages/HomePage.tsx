@@ -95,6 +95,17 @@ const css = `
   .hp-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.7rem; }
   .hp-events-empty { color: var(--text-light); font-size: 0.9rem; }
 
+  /* 過去イベントの開閉ボタン */
+  .hp-past-toggle { display: flex; justify-content: center; margin-top: 0.8rem; }
+  .hp-past-toggle-btn {
+    font-size: 0.9rem; padding: 0.35rem 1rem;
+    border-radius: 0.6rem; border: 1.5px solid var(--pink);
+    color: var(--pink); background: rgba(255,255,255,0.6);
+    cursor: pointer; transition: background 0.15s;
+    font-family: inherit;
+  }
+  .hp-past-toggle-btn:hover { background: rgba(230,138,182,0.18); }
+
   /* === Event Cards === */
   .ec-card {
     background: var(--card-bg); border-radius: 1.2rem;
@@ -503,12 +514,15 @@ function GallerySection({
   );
 }
 
+const PAST_INITIAL_COUNT = 3;
+
 export default function HomePage() {
   const { user, signInWithGoogle, signOutUser } = useAuth();
   const { events, loading } = useEvents();
   const { galleries } = useGalleries();
   const navigate = useNavigate();
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+  const [pastExpanded, setPastExpanded] = useState(false);
   const openLightbox = (urls: string[], index: number) => setLightbox({ urls, index });
   const closeLightbox = () => setLightbox(null);
 
@@ -568,7 +582,23 @@ export default function HomePage() {
               {past.length > 0 && (
                 <>
                   <p className="hp-sub-title">過去</p>
-                  <div className="hp-cards">{past.map((e) => <EventCard key={e.id} event={e} isPast />)}</div>
+                  <div className="hp-cards">
+                    {(pastExpanded ? past : past.slice(0, PAST_INITIAL_COUNT)).map((e) => (
+                      <EventCard key={e.id} event={e} isPast />
+                    ))}
+                  </div>
+                  {past.length > PAST_INITIAL_COUNT && (
+                    <div className="hp-past-toggle">
+                      <button
+                        className="hp-past-toggle-btn"
+                        onClick={() => setPastExpanded((v) => !v)}
+                      >
+                        {pastExpanded
+                          ? "閉じる"
+                          : `もっと見る (残り ${past.length - PAST_INITIAL_COUNT} 件)`}
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </>
