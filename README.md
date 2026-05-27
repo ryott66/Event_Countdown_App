@@ -27,7 +27,7 @@
 
 ```
 ① LoginPage             未ログイン & ゲストキー不一致時に表示
-② HomePage              イベント一覧 + 共有ギャラリー（Memories）
+② HomePage              Togetherカウンター + イベント一覧 + 共有ギャラリー（Memories）
 ③ EventDetailPage       テンプレート方式 or カスタムページ
 ④ EventFormPage         イベント追加・編集（管理者のみ）
 ```
@@ -221,12 +221,58 @@ Homeページ下部の「Mirror Moments」「Cutest Moments」は**イベント�
 
 ## デプロイ
 
+### 自動デプロイ（GitHub Actions）
+
+`main` ブランチへの push をトリガーに [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) が自動で実行される:
+
+1. `countdown-app` で `npm ci` & `npm run build`
+2. ビルド成果物 `dist/` を `gh-pages` ブランチに push
+3. GitHub Pages が `gh-pages` ブランチを公開
+
+通常運用では **PR をマージするだけで本番反映** される。`gh-pages` ブランチは Actions が自動で書き換えるので手で触らない。
+
+### PR CI
+
+`main` 向け PR が開かれた時 / PR ブランチに push された時に [`.github/workflows/ci.yml`](.github/workflows/ci.yml) が `npm run lint` + `npm run build` を走らせる。ビルド失敗のコードが main に入らないためのセーフティネット。
+
+### GitHub Secrets（初期設定が必要）
+
+ワークフローは Firebase 設定値を Secrets から読む。リポジトリの **Settings → Secrets and variables → Actions** に以下を登録しておく必要がある（ローカル `.env` と同じ値）:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_ADMIN_UIDS`
+
+加えて **Settings → Actions → General → Workflow permissions** を「Read and write」にして、`GITHUB_TOKEN` に `gh-pages` ブランチへの push 権限を与える。
+
+### 推奨ブランチ運用
+
+```
+feat/xxx → develop に PR & マージ
+                    ↓
+            develop → main に PR & マージ
+                    ↓
+              ← 自動デプロイ
+```
+
+- 機能ブランチは `develop` から切る
+- 本番反映したいタイミングで `develop → main` の PR を立てる
+- `main` への直 push も自動デプロイの対象だが、緊急時以外は PR 経由を推奨
+
+### 手動デプロイ（フォールバック）
+
+Actions が止まっている時や緊急時に手元から直接デプロイしたい場合:
+
 ```bash
 cd countdown-app
 npm run deploy
 ```
 
-`predeploy` で `npm run build` が走り、`gh-pages -d dist` で GitHub Pages に push される。
+`predeploy` で `npm run build` が走り、`gh-pages -d dist` で GitHub Pages に push される。Actions 経由と結果は同じ。
 
 ### PWA（ホーム画面追加）
 - `vite-plugin-pwa` で manifest と Service Worker を自動生成（[vite.config.ts](countdown-app/vite.config.ts)）
@@ -244,29 +290,34 @@ npm run deploy
 ## プロジェクト構成
 
 ```
-countdown-app/
-├── public/              # 静的アセット（ビルドでそのまま配信）
-│   ├── images/          # 内蔵画像（カスタムページから参照）
-│   ├── icon-192.png     # PWAアイコン
-│   ├── icon-512.png
-│   └── favicon.svg
-├── src/
-│   ├── components/      # EventCard など共通UI
-│   ├── constants/       # themes, galleries の定義
-│   ├── contexts/        # AuthContext（認証状態）
-│   ├── custom-pages/    # ★イベント詳細のカスタムページ
-│   │   ├── index.ts     #   レジストリ
-│   │   └── birthday-2026.tsx
-│   ├── hooks/           # useEvents, useEvent, useGalleries
-│   ├── lib/             # firebase.ts, eventService.ts, imageCompression.ts
-│   ├── pages/           # HomePage, EventDetailPage, EventFormPage, LoginPage
-│   ├── types/           # 型定義
-│   ├── App.tsx          # ルーティング
-│   └── main.tsx         # エントリポイント
-├── firestore.rules      # Firestore セキュリティルール
-├── storage.rules        # Storage セキュリティルール
-├── vite.config.ts       # Vite + PWA設定
-└── .env                 # 環境変数（Git管理外）
+.
+├── .github/
+│   └── workflows/
+│       ├── ci.yml           # PR時のlint+build検証
+│       └── deploy.yml       # mainへのpushでgh-pagesに自動デプロイ
+└── countdown-app/
+    ├── public/              # 静的アセット（ビルドでそのまま配信）
+    │   ├── images/          # 内蔵画像（カスタムページ・Togetherアイコン等から参照）
+    │   ├── icon-192.png     # PWAアイコン
+    │   ├── icon-512.png
+    │   └── favicon.svg
+    ├── src/
+    │   ├── components/      # EventCard, TogetherCounter など共通UI
+    │   ├── constants/       # themes, galleries, together の定義
+    │   ├── contexts/        # AuthContext（認証状態）
+    │   ├── custom-pages/    # ★イベント詳細のカスタムページ
+    │   │   ├── index.ts     #   レジストリ
+    │   │   └── birthday-2026.tsx
+    │   ├── hooks/           # useEvents, useEvent, useGalleries
+    │   ├── lib/             # firebase.ts, eventService.ts, imageCompression.ts
+    │   ├── pages/           # HomePage, EventDetailPage, EventFormPage, LoginPage
+    │   ├── types/           # 型定義
+    │   ├── App.tsx          # ルーティング
+    │   └── main.tsx         # エントリポイント
+    ├── firestore.rules      # Firestore セキュリティルール
+    ├── storage.rules        # Storage セキュリティルール
+    ├── vite.config.ts       # Vite + PWA設定
+    └── .env                 # 環境変数（Git管理外）
 ```
 
 ---
