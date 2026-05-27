@@ -51,17 +51,20 @@ export default function EventFormPage() {
   const [saving, setSaving] = useState(false);
   const [iconHover, setIconHover] = useState(false);
 
-  useEffect(() => {
-    if (isEdit && !loading && event) {
-      setTitle(event.title);
-      setDate(event.date);
-      setEmoji(event.emoji);
-      setTheme(event.theme);
-      setMemo(event.memo ?? "");
-      setIconUrl(event.iconUrl ?? "");
-      setImageUrls(event.imageUrls ?? []);
-    }
-  }, [isEdit, loading, event?.id]);
+  // event が取得できたタイミングで一度だけフォームを初期化する。
+  // useEffect 内で setState は React 19 ルール違反になるため、
+  // render 時に「初期化済みID」と現在の event.id を比較する公式パターンで行う。
+  const [initializedEventId, setInitializedEventId] = useState<string | null>(null);
+  if (isEdit && !loading && event && initializedEventId !== event.id) {
+    setInitializedEventId(event.id);
+    setTitle(event.title);
+    setDate(event.date);
+    setEmoji(event.emoji);
+    setTheme(event.theme);
+    setMemo(event.memo ?? "");
+    setIconUrl(event.iconUrl ?? "");
+    setImageUrls(event.imageUrls ?? []);
+  }
 
   useEffect(() => {
     const root = document.getElementById("root");

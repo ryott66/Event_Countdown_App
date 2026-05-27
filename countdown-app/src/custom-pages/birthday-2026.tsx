@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";
-// @ts-ignore
 import HTMLFlipBook from "react-pageflip";
 import { handleButtonClick } from "../utils/handleButtonClick";
 import { useAuth } from "../contexts/AuthContext";
@@ -451,7 +450,7 @@ export default function Birthday2026({ event }: Props) {
           {isToday ? (
             <>
               🎉 <span className="b26-birthday-script">Happy Birthday</span> 🎉<br />
-              <span className="b26-birthday-script">　Remina</span>
+              <span className="b26-birthday-script">{"　"}Remina</span>
               {/* 年齢：来年は24に変える */}
               <span className="b26-birthday-num">23</span>
             </>
@@ -471,7 +470,7 @@ export default function Birthday2026({ event }: Props) {
       {/* Book Section */}
       <div className="b26-book-section">
         <h2 className="b26-booksection-title">Book</h2>
-        {/* @ts-ignore */}
+        {/* @ts-expect-error swipeDistance prop is required by typings but works fine without it */}
         <HTMLFlipBook
           width={bookPageWidth} height={bookPageHeight} size="fixed"
           minWidth={150} maxWidth={1000} minHeight={200} maxHeight={1536}

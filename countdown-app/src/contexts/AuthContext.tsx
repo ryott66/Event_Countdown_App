@@ -70,6 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// React Context + hook の慣用パターン。AuthProvider と同じファイルに置きたいので
+// Fast Refresh の制限ルールはここだけ無効化する（コンポーネント外の関数 export のみ）。
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");

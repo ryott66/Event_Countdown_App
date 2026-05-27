@@ -73,7 +73,7 @@ function TemplateDetail({ event }: { event: Event }) {
     fire(); // 1回目: ページ表示直後
     const id = window.setTimeout(fire, 3000); // 2回目: 3秒後で打ち止め
     return () => window.clearTimeout(id);
-  }, [isToday]);
+  }, [isToday, theme.confettiColors]);
 
   return (
     <div style={{ minHeight: "100svh", background: theme.bg }}>
