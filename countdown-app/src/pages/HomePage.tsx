@@ -442,10 +442,9 @@ function GallerySection({
     setUploading(false);
   };
 
-  useEffect(() => {
-    if (!editMode) setLocalUrls([...urls]);
-  }, [urls, editMode]);
-
+  // localUrls は編集モード中のドラフトのみで使用する。
+  // 非編集モード時は displayUrls = urls で props を直接参照するので、
+  // urls との同期は enterEdit() が呼ばれた瞬間に行えば十分。
   const displayUrls = editMode ? localUrls : urls;
 
   return (
