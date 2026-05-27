@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+# main への push をトリガーに、countdown-app をビルドして
+# gh-pages ブランチへデプロイする（ローカルの `npm run deploy` の代替）
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # GitHub UI から手動実行も可能
+
+# 連続 push 時は古い実行をキャンセルして最新だけ走らせる
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: write  # gh-pages ブランチへの push に必要
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: countdown-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: countdown-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          # Firebase 設定値と管理者 UID リストは GitHub の
+          # Settings > Secrets and variables > Actions に登録した値を読む
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_ADMIN_UIDS: ${{ secrets.VITE_ADMIN_UIDS }}
+        run: npm run build
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: countdown-app/dist
+          publish_branch: gh-pages
