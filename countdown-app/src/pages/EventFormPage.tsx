@@ -86,7 +86,7 @@ export default function EventFormPage() {
     if (!files[0]) return;
     setIconUploading(true);
     const tempId = isEdit ? id! : `temp_${Date.now()}`;
-    const url = await uploadImage(files[0], tempId);
+    const url = await uploadImage(files[0], tempId, "", "icon");
     setIconUrl(url);
     setIconUploading(false);
   };
@@ -95,7 +95,7 @@ export default function EventFormPage() {
     if (!files[0]) return;
     setHeroUploading(true);
     const tempId = isEdit ? id! : `temp_${Date.now()}`;
-    const url = await uploadImage(files[0], tempId, "hero");
+    const url = await uploadImage(files[0], tempId, "hero", "hero");
     setHeroImageUrl(url);
     setHeroUploading(false);
   };
@@ -105,7 +105,7 @@ export default function EventFormPage() {
     const tempId = isEdit ? id! : `temp_${Date.now()}`;
     const urls: string[] = [];
     for (const file of Array.from(files)) {
-      const url = await uploadImage(file, tempId);
+      const url = await uploadImage(file, tempId, "", "gallery");
       urls.push(url);
     }
     setImageUrls((prev) => [...prev, ...urls]);

@@ -4,7 +4,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "./firebase";
-import { compressImage } from "./imageCompression";
+import { compressImage, type ImageProfile } from "./imageCompression";
 import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import type { ThemeKey } from "../constants/themes";
 
@@ -22,15 +22,21 @@ export interface EventInput {
   createdBy: string;
 }
 
-export async function uploadImage(file: File, eventId: string, folder = ""): Promise<string> {
-  const blob = await compressImage(file);
-  const filename = `${Date.now()}_${file.name.replace(/\.[^.]+$/, "")}.jpg`;
+export async function uploadImage(
+  file: File,
+  eventId: string,
+  folder = "",
+  profile: ImageProfile = "gallery",
+): Promise<string> {
+  const { blob, contentType, ext } = await compressImage(file, profile);
+  const baseName = file.name.replace(/\.[^.]+$/, "");
+  const filename = `${Date.now()}_${baseName}.${ext}`;
   const path = folder
     ? `events/${eventId}/${folder}/${filename}`
     : `events/${eventId}/${filename}`;
   const storageRef = ref(storage, path);
   await uploadBytes(storageRef, blob, {
-    contentType: "image/jpeg",
+    contentType,
     cacheControl: "public, max-age=31536000, immutable",
   });
   return getDownloadURL(storageRef);
