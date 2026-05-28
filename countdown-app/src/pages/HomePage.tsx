@@ -445,7 +445,7 @@ function GallerySection({
     setUploading(true);
     const uploaded: string[] = [];
     for (const file of Array.from(files)) {
-      const u = await uploadImage(file, "galleries", gallery);
+      const u = await uploadImage(file, "galleries", gallery, "gallery");
       uploaded.push(u);
       setLocalUrls((prev) => [...prev, u]);
     }
