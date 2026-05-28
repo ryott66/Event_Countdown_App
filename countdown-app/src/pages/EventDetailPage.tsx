@@ -133,18 +133,40 @@ function TemplateDetail({ event }: { event: Event }) {
           <div style={{
             background: "linear-gradient(135deg, #ffffff, #fff6fa)",
             borderRadius: "22px",
-            padding: "1rem 1.6rem",
+            padding: "0.9rem 1.4rem 0.9rem 1rem",
             width: "fit-content",
             maxWidth: "100%",
             margin: "0 auto",
             border: `2px solid ${theme.accent}`,
             boxShadow: `0 0 0 5px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.12)`,
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
           }}>
-            <div style={{ fontSize: "clamp(2.6rem, 11vw, 3.6rem)", lineHeight: 1, marginBottom: "0.35rem" }}>{event.emoji}</div>
-            <h1 style={{ color: theme.accent, fontSize: "clamp(1.8rem, 6vw, 2.4rem)", marginBottom: "0.3rem", letterSpacing: "0.01em" }}>
-              {event.title}
-            </h1>
-            <p style={{ color: theme.accent, opacity: 0.8, fontSize: "0.9rem", letterSpacing: "0.05em" }}>{event.date}</p>
+            <div style={{
+              flexShrink: 0,
+              width: "clamp(3.2rem, 13vw, 4.2rem)",
+              height: "clamp(3.2rem, 13vw, 4.2rem)",
+              borderRadius: "16px",
+              overflow: "hidden",
+              background: event.iconUrl ? undefined : `linear-gradient(135deg, ${theme.numBg}, #fff)`,
+              border: `1.5px solid ${theme.accent}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              {event.iconUrl ? (
+                <img src={event.iconUrl} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <span style={{ fontSize: "clamp(1.8rem, 7vw, 2.4rem)", lineHeight: 1 }}>{event.emoji}</span>
+              )}
+            </div>
+            <div style={{ textAlign: "left", minWidth: 0 }}>
+              <h1 style={{ color: theme.accent, fontSize: "clamp(1.6rem, 5.5vw, 2.2rem)", marginBottom: "0.25rem", letterSpacing: "0.01em" }}>
+                {event.title}
+              </h1>
+              <p style={{ color: theme.accent, opacity: 0.8, fontSize: "0.9rem", letterSpacing: "0.05em" }}>{event.date}</p>
+            </div>
           </div>
 
           {/* カウントダウン */}
