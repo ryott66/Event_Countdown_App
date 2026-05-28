@@ -15,10 +15,12 @@ import { uploadImage, addToGallery, updateGalleryOrder } from "../lib/eventServi
 import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import EventCard from "../components/EventCard";
 import TogetherCounter from "../components/TogetherCounter";
+import SeasonalDecoration from "../components/SeasonalDecoration";
 
 const css = `
   html { font-size: clamp(2px, 1.25vw, 16px); }
-  .hp-body { background-color: #fff0f5; font-family: sans-serif; overflow-x: hidden; min-height: 100svh; }
+  /* isolation: SeasonalDecoration (z-index: -1) を hp-body の背景色とメインコンテンツの間に挟むため stacking context を作る */
+  .hp-body { background-color: #fff0f5; font-family: sans-serif; overflow-x: hidden; min-height: 100svh; isolation: isolate; }
 
   /* === Header === */
   .hp-header {
@@ -544,6 +546,8 @@ export default function HomePage() {
   return (
     <div className="hp-body" style={{ minHeight: "100svh" }}>
       <style>{css}</style>
+
+      <SeasonalDecoration />
 
       <header className="hp-header">
         <div className="hp-logo-wrap">
