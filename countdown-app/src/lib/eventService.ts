@@ -15,6 +15,7 @@ export interface EventInput {
   theme: ThemeKey;
   memo: string;
   iconUrl: string;
+  heroImageUrl?: string;
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;

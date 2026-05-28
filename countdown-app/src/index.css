@@ -38,3 +38,8 @@ button {
   border: none;
   font-family: inherit;
 }
+
+input::placeholder,
+textarea::placeholder {
+  color: #c8c8c8;
+}
