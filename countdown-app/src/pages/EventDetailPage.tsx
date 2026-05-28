@@ -209,54 +209,84 @@ function TemplateDetail({ event }: { event: Event }) {
 
       {/* 下のセクション: メモ / 画像ギャラリー */}
       {(event.memo || event.imageUrls?.length > 0) && (
-        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "2rem 1.5rem 3rem", textAlign: "center" }}>
+        <div style={{ padding: "2rem 0 3rem" }}>
           {event.memo && (
             <div style={{
-              background: "rgba(255,255,255,0.55)",
-              borderRadius: "22px",
-              padding: "1.5rem 1.75rem",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.5)",
-              boxShadow: "0 8px 28px rgba(0,0,0,0.06)",
-              textAlign: "left",
-              color: "var(--text)",
-              lineHeight: 1.7,
-              whiteSpace: "pre-wrap",
-              fontSize: "1rem",
+              maxWidth: "560px",
+              margin: "0 auto",
+              padding: "0 1.5rem",
             }}>
-              {event.memo}
+              <div style={{
+                position: "relative",
+                background: "linear-gradient(180deg, #fffbf5 0%, #fff5ee 100%)",
+                borderRadius: "18px",
+                padding: "2rem 1.75rem 1.75rem",
+                border: `1.5px dashed ${theme.accent}`,
+                boxShadow: "0 6px 22px rgba(0,0,0,0.08)",
+                color: "var(--text)",
+                lineHeight: 1.9,
+                whiteSpace: "pre-wrap",
+                fontSize: "1rem",
+                textAlign: "center",
+                letterSpacing: "0.02em",
+              }}>
+                <div style={{
+                  position: "absolute",
+                  top: "-0.95rem",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: theme.accent,
+                  color: "#fff",
+                  width: "1.9rem",
+                  height: "1.9rem",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "0.95rem",
+                  boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
+                  border: "2px solid #fffbf5",
+                }}>♡</div>
+                {event.memo}
+              </div>
             </div>
           )}
 
           {event.imageUrls?.length > 0 && (
             <div style={{
-              display: "flex",
-              gap: "0.75rem",
-              overflowX: "auto",
               marginTop: event.memo ? "1.5rem" : 0,
-              paddingBottom: "0.5rem",
-              scrollSnapType: "x mandatory",
+              background: `linear-gradient(90deg, ${theme.accent} 0%, #fff9e6 50%, ${theme.accent} 100%)`,
+              border: "0.35rem solid #c9c9c9",
+              borderLeft: "none",
+              borderRight: "none",
+              padding: "0.6rem 0.4rem 1.2rem",
             }}>
-              {event.imageUrls.map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  style={{
-                    width: "min(80vw, 360px)",
-                    height: "min(80vw, 360px)",
-                    objectFit: "cover",
-                    borderRadius: "22px",
-                    flexShrink: 0,
-                    scrollSnapAlign: "start",
-                    boxShadow: "0 10px 28px rgba(0,0,0,0.12)",
-                    border: "1px solid rgba(255,255,255,0.4)",
-                  }}
-                />
-              ))}
+              <div style={{
+                display: "flex",
+                overflowX: "auto",
+                scrollSnapType: "x mandatory",
+                gap: "0.6rem",
+                padding: "0.8rem 0.5rem 0.5rem",
+              }}>
+                {event.imageUrls.map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    style={{
+                      height: "clamp(15rem, 55vw, 24rem)",
+                      border: "0.15rem solid rgb(128,128,128)",
+                      borderRadius: "0.6rem",
+                      objectFit: "cover",
+                      display: "block",
+                      scrollSnapAlign: "start",
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
