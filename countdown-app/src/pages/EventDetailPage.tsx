@@ -5,6 +5,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
 import { customPageRegistry } from "../custom-pages";
 import { THEMES } from "../constants/themes";
+import { getCurrentSeason } from "../constants/seasonal";
+import SeasonalDecoration from "../components/SeasonalDecoration";
 import type { Event } from "../types";
 
 function useCountdown(dateStr: string) {
@@ -75,8 +77,13 @@ function TemplateDetail({ event }: { event: Event }) {
     return () => window.clearTimeout(id);
   }, [isToday, theme.confettiColors]);
 
+  // event.date の月から季節を決める。閲覧時点の今日ではなく、イベントの世界観に合わせる。
+  const eventSeason = getCurrentSeason(new Date(event.date));
+
   return (
-    <div style={{ minHeight: "100svh", background: theme.bg }}>
+    // isolation: SeasonalDecoration (z-index:-1) を背景色とコンテンツの間に挟むため
+    <div style={{ minHeight: "100svh", background: theme.bg, isolation: "isolate" }}>
+      <SeasonalDecoration season={eventSeason} />
       {/* ヘッダー */}
       <div style={{ padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <button onClick={() => navigate("/")} style={{ background: "none", fontSize: "1.3rem", color: theme.accent }}>
