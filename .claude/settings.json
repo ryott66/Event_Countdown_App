@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls C:/Users/r66ta/.claude/projects/c--Users-r66ta-Projects-Event-Countdown/memory/)",
-      "Read(//c/Users/r66ta/.claude/projects/c--Users-r66ta-Projects-Event-Countdown/memory/**)"
-    ]
-  }
-}
