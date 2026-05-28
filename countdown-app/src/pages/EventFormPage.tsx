@@ -37,6 +37,7 @@ export default function EventFormPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const iconFileInputRef = useRef<HTMLInputElement>(null);
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
@@ -45,11 +46,14 @@ export default function EventFormPage() {
   const [theme, setTheme] = useState<ThemeKey>("birthday");
   const [memo, setMemo] = useState("");
   const [iconUrl, setIconUrl] = useState("");
+  const [heroImageUrl, setHeroImageUrl] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [iconUploading, setIconUploading] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [iconHover, setIconHover] = useState(false);
+  const [heroHover, setHeroHover] = useState(false);
 
   // event が取得できたタイミングで一度だけフォームを初期化する。
   // useEffect 内で setState は React 19 ルール違反になるため、
@@ -63,6 +67,7 @@ export default function EventFormPage() {
     setTheme(event.theme);
     setMemo(event.memo ?? "");
     setIconUrl(event.iconUrl ?? "");
+    setHeroImageUrl(event.heroImageUrl ?? "");
     setImageUrls(event.imageUrls ?? []);
   }
 
@@ -86,6 +91,15 @@ export default function EventFormPage() {
     setIconUploading(false);
   };
 
+  const handleHeroUpload = async (files: FileList) => {
+    if (!files[0]) return;
+    setHeroUploading(true);
+    const tempId = isEdit ? id! : `temp_${Date.now()}`;
+    const url = await uploadImage(files[0], tempId, "hero");
+    setHeroImageUrl(url);
+    setHeroUploading(false);
+  };
+
   const handleGalleryUpload = async (files: FileList) => {
     setGalleryUploading(true);
     const tempId = isEdit ? id! : `temp_${Date.now()}`;
@@ -103,7 +117,7 @@ export default function EventFormPage() {
     if (!title || !date || !emoji) return;
     setSaving(true);
     const input = {
-      title, date, emoji, theme, memo, iconUrl, imageUrls,
+      title, date, emoji, theme, memo, iconUrl, heroImageUrl, imageUrls,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
       createdBy: user.uid ?? "",
@@ -146,7 +160,7 @@ export default function EventFormPage() {
 
       <form onSubmit={handleSubmit} style={{ maxWidth: "540px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
         <FormField label="タイトル *">
-          <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Reminaの誕生日" />
+          <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="誕生日" />
         </FormField>
 
         <FormField label="日付 *">
@@ -276,6 +290,70 @@ export default function EventFormPage() {
           </div>
         </FormField>
 
+        <FormField label="ヒーロー背景画像">
+          <input
+            ref={heroFileInputRef} type="file" accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => e.target.files?.length && handleHeroUpload(e.target.files)}
+          />
+          <div
+            onClick={() => heroFileInputRef.current?.click()}
+            onMouseEnter={() => setHeroHover(true)}
+            onMouseLeave={() => setHeroHover(false)}
+            style={{
+              width: "100%",
+              aspectRatio: "16 / 9",
+              borderRadius: "14px",
+              overflow: "hidden",
+              cursor: "pointer",
+              position: "relative",
+              border: heroImageUrl ? "2px solid #f0d0e0" : "2px dashed #f0d0e0",
+              background: heroImageUrl ? undefined : "linear-gradient(135deg, #fce4ec, #f8bbd0)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {heroImageUrl ? (
+              <img src={heroImageUrl} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            ) : (
+              <span style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.95)", fontWeight: 600 }}>
+                ページの背景にする画像
+              </span>
+            )}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "rgba(0,0,0,0.32)",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", gap: "0.25rem",
+              opacity: heroHover || heroUploading ? 1 : 0,
+              transition: "opacity 0.2s",
+            }}>
+              <span style={{ fontSize: "1.6rem", lineHeight: 1 }}>
+                {heroUploading ? "⏳" : "📷"}
+              </span>
+              <span style={{ fontSize: "0.8rem", color: "#fff", fontWeight: 600 }}>
+                {heroUploading ? "アップロード中..." : heroImageUrl ? "画像を変更" : "画像を追加"}
+              </span>
+            </div>
+          </div>
+          {heroImageUrl && (
+            <button
+              type="button"
+              onClick={() => { if (confirm("ヒーロー背景画像を削除しますか？")) setHeroImageUrl(""); }}
+              style={{
+                marginTop: "0.5rem", width: "100%",
+                padding: "0.4rem 0", fontSize: "0.8rem",
+                color: "#e05", background: "none",
+                border: "1px solid #e05", borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              画像を削除
+            </button>
+          )}
+        </FormField>
+
         <FormField label="メモ">
           <textarea
             style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }}
@@ -325,7 +403,7 @@ export default function EventFormPage() {
         </FormField>
 
         <button
-          type="submit" disabled={saving || galleryUploading || iconUploading}
+          type="submit" disabled={saving || galleryUploading || iconUploading || heroUploading}
           style={{
             width: "100%", padding: "0.9rem", borderRadius: "12px",
             background: "var(--pink)", color: "#fff",

@@ -5,6 +5,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
 import { customPageRegistry } from "../custom-pages";
 import { THEMES } from "../constants/themes";
+import { getCurrentSeason } from "../constants/seasonal";
+import SeasonalDecoration from "../components/SeasonalDecoration";
 import type { Event } from "../types";
 
 function useCountdown(dateStr: string) {
@@ -44,19 +46,21 @@ function useCountdown(dateStr: string) {
 
 function CountdownUnit({ value, label, color, bg, accent }: { value: number; label: string; color: string; bg: string; accent: string }) {
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ flex: "1 1 0", minWidth: "5rem", maxWidth: "9rem", textAlign: "center" }}>
       <div style={{
         background: bg,
-        borderRadius: "16px",
-        padding: "0.75rem 1rem",
-        minWidth: "4.5rem",
-        backdropFilter: "blur(4px)",
+        borderRadius: "20px",
+        padding: "1rem 0.5rem",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        border: "1px solid rgba(255,255,255,0.5)",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
       }}>
-        <div style={{ color, fontFamily: '"Dancing Script", cursive', fontSize: "clamp(2rem, 8vw, 3rem)", lineHeight: 1 }}>
+        <div style={{ color, fontFamily: '"Dancing Script", cursive', fontSize: "clamp(2.2rem, 9vw, 3.4rem)", lineHeight: 1 }}>
           {String(value).padStart(2, "0")}
         </div>
       </div>
-      <div style={{ color: accent, opacity: 0.7, fontSize: "0.75rem", marginTop: "0.4rem" }}>{label}</div>
+      <div style={{ color: accent, opacity: 0.7, fontSize: "0.8rem", marginTop: "0.45rem", letterSpacing: "0.05em" }}>{label}</div>
     </div>
   );
 }
@@ -75,97 +79,188 @@ function TemplateDetail({ event }: { event: Event }) {
     return () => window.clearTimeout(id);
   }, [isToday, theme.confettiColors]);
 
+  // event.date の月から季節を決める。閲覧時点の今日ではなく、イベントの世界観に合わせる。
+  const eventSeason = getCurrentSeason(new Date(event.date));
+
+  const hasHero = !!event.heroImageUrl;
+  const heroBgStyle: React.CSSProperties = hasHero
+    ? {
+        backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.40) 100%), url(${event.heroImageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }
+    : {};
+  const glassButtonStyle: React.CSSProperties = {
+    background: hasHero ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.4)",
+    color: theme.accent,
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    border: "1px solid rgba(255,255,255,0.6)",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+  };
+
   return (
-    <div style={{ minHeight: "100svh", background: theme.bg }}>
-      {/* ヘッダー */}
-      <div style={{ padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <button onClick={() => navigate("/")} style={{ background: "none", fontSize: "1.3rem", color: theme.accent }}>
-          ←
-        </button>
-        {user.state === "admin" && (
-          <button
-            onClick={() => navigate(`/events/${event.id}/edit`)}
-            style={{ background: "none", color: theme.accent, fontSize: "0.9rem", border: `1.5px solid ${theme.accent}`, borderRadius: "20px", padding: "0.3rem 0.9rem" }}
-          >
-            編集
+    // isolation: SeasonalDecoration (z-index:-1) を背景色とコンテンツの間に挟むため
+    <div style={{ minHeight: "100svh", background: theme.bg, isolation: "isolate" }}>
+      <SeasonalDecoration season={eventSeason} />
+
+      {/* ヒーロー */}
+      <section style={{
+        position: "relative",
+        minHeight: "92svh",
+        display: "flex",
+        flexDirection: "column",
+        ...heroBgStyle,
+      }}>
+        {/* ヘッダー */}
+        <div style={{ maxWidth: "720px", width: "100%", margin: "0 auto", padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button onClick={() => navigate("/")} style={{ ...glassButtonStyle, fontSize: "1.1rem", borderRadius: "50%", width: "2.4rem", height: "2.4rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            ←
           </button>
-        )}
-      </div>
+          {user.state === "admin" && (
+            <button
+              onClick={() => navigate(`/events/${event.id}/edit`)}
+              style={{ ...glassButtonStyle, fontSize: "0.9rem", borderRadius: "20px", padding: "0.4rem 1rem" }}
+            >
+              編集
+            </button>
+          )}
+        </div>
 
-      {/* メイン */}
-      <div style={{ padding: "1rem 1.5rem 3rem", textAlign: "center" }}>
-        <div style={{ fontSize: "4rem", marginBottom: "0.5rem" }}>{event.emoji}</div>
-        <h1 style={{ color: theme.accent, fontSize: "clamp(1.8rem, 6vw, 2.4rem)", marginBottom: "0.5rem" }}>
-          {event.title}
-        </h1>
-        <p style={{ color: theme.accent, opacity: 0.7, marginBottom: "2.5rem", fontSize: "0.95rem" }}>{event.date}</p>
-
-        {/* カウントダウン */}
-        {isToday ? (
-          <div style={{ margin: "2rem 0" }}>
-            <div style={{ fontFamily: '"Dancing Script", cursive', fontSize: "clamp(2.5rem, 10vw, 4rem)", color: theme.accent }}>
-              🎉 Happy Day! 🎉
+        {/* ヒーロー中身: emoji + title + date + countdown */}
+        <div style={{ maxWidth: "720px", width: "100%", margin: "0 auto", padding: "0.5rem 1.5rem 2.5rem", textAlign: "center", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: "1.5rem" }}>
+          {/* タイトル・日付の塗りつぶしフレーム */}
+          <div style={{
+            background: "linear-gradient(135deg, #ffffff, #fff6fa)",
+            borderRadius: "22px",
+            padding: "0.9rem 1.4rem 0.9rem 1rem",
+            width: "fit-content",
+            maxWidth: "100%",
+            margin: "0 auto",
+            border: `2px solid ${theme.accent}`,
+            boxShadow: `0 0 0 5px rgba(255,255,255,0.55), 0 10px 24px rgba(0,0,0,0.12)`,
+            display: "flex",
+            alignItems: "center",
+            gap: "1rem",
+          }}>
+            <div style={{
+              flexShrink: 0,
+              width: "clamp(3.2rem, 13vw, 4.2rem)",
+              height: "clamp(3.2rem, 13vw, 4.2rem)",
+              borderRadius: "16px",
+              overflow: "hidden",
+              background: event.iconUrl ? undefined : `linear-gradient(135deg, ${theme.numBg}, #fff)`,
+              border: `1.5px solid ${theme.accent}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              {event.iconUrl ? (
+                <img src={event.iconUrl} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <span style={{ fontSize: "clamp(1.8rem, 7vw, 2.4rem)", lineHeight: 1 }}>{event.emoji}</span>
+              )}
+            </div>
+            <div style={{ textAlign: "left", minWidth: 0 }}>
+              <h1 style={{ color: theme.accent, fontSize: "clamp(1.6rem, 5.5vw, 2.2rem)", marginBottom: "0.25rem", letterSpacing: "0.01em" }}>
+                {event.title}
+              </h1>
+              <p style={{ color: theme.accent, opacity: 0.8, fontSize: "0.9rem", letterSpacing: "0.05em" }}>{event.date}</p>
             </div>
           </div>
-        ) : isPast ? (
-          <p style={{ color: theme.accent, opacity: 0.6, fontSize: "1.1rem" }}>素敵な思い出になりました ✨</p>
-        ) : (
-          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "2rem" }}>
-            <CountdownUnit value={days} label="days" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
-            <CountdownUnit value={hours} label="hours" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
-            <CountdownUnit value={minutes} label="min" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
-            <CountdownUnit value={seconds} label="sec" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
-          </div>
-        )}
 
-        {/* メモ */}
-        {event.memo && (
-          <div style={{
-            background: "rgba(255,255,255,0.6)",
-            borderRadius: "16px",
-            padding: "1rem 1.25rem",
-            margin: "1.5rem 0",
-            backdropFilter: "blur(4px)",
-            textAlign: "left",
-            color: "var(--text)",
-            lineHeight: 1.7,
-            whiteSpace: "pre-wrap",
-          }}>
-            {event.memo}
-          </div>
-        )}
+          {/* カウントダウン */}
+          {isToday ? (
+            <div style={{
+              padding: "1.5rem 1.25rem",
+              background: "rgba(255,255,255,0.45)",
+              borderRadius: "24px",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.55)",
+              boxShadow: "0 10px 32px rgba(0,0,0,0.12)",
+            }}>
+              <div style={{ fontFamily: '"Dancing Script", cursive', fontSize: "clamp(2.5rem, 10vw, 4rem)", color: theme.accent }}>
+                🎉 Happy Day! 🎉
+              </div>
+            </div>
+          ) : isPast ? (
+            <div style={{
+              padding: "1.25rem",
+              background: "rgba(255,255,255,0.45)",
+              borderRadius: "24px",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.55)",
+              boxShadow: "0 10px 32px rgba(0,0,0,0.12)",
+            }}>
+              <p style={{ color: theme.accent, opacity: 0.75, fontSize: "1.1rem" }}>素敵な思い出になりました ✨</p>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: "0.85rem", justifyContent: "center", flexWrap: "wrap" }}>
+              <CountdownUnit value={days} label="days" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
+              <CountdownUnit value={hours} label="hours" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
+              <CountdownUnit value={minutes} label="min" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
+              <CountdownUnit value={seconds} label="sec" color={theme.numColor} bg={theme.numBg} accent={theme.accent} />
+            </div>
+          )}
+        </div>
+      </section>
 
-        {/* 画像ギャラリー */}
-        {event.imageUrls?.length > 0 && (
-          <div style={{
-            display: "flex",
-            gap: "0.75rem",
-            overflowX: "auto",
-            marginTop: "1.5rem",
-            paddingBottom: "0.5rem",
-            scrollSnapType: "x mandatory",
-          }}>
-            {event.imageUrls.map((url, i) => (
-              <img
-                key={i}
-                src={url}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                style={{
-                  width: "min(75vw, 300px)",
-                  height: "min(75vw, 300px)",
-                  objectFit: "cover",
-                  borderRadius: "16px",
-                  flexShrink: 0,
-                  scrollSnapAlign: "start",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* 下のセクション: メモ / 画像ギャラリー */}
+      {(event.memo || event.imageUrls?.length > 0) && (
+        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "2rem 1.5rem 3rem", textAlign: "center" }}>
+          {event.memo && (
+            <div style={{
+              background: "rgba(255,255,255,0.55)",
+              borderRadius: "22px",
+              padding: "1.5rem 1.75rem",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              border: "1px solid rgba(255,255,255,0.5)",
+              boxShadow: "0 8px 28px rgba(0,0,0,0.06)",
+              textAlign: "left",
+              color: "var(--text)",
+              lineHeight: 1.7,
+              whiteSpace: "pre-wrap",
+              fontSize: "1rem",
+            }}>
+              {event.memo}
+            </div>
+          )}
+
+          {event.imageUrls?.length > 0 && (
+            <div style={{
+              display: "flex",
+              gap: "0.75rem",
+              overflowX: "auto",
+              marginTop: event.memo ? "1.5rem" : 0,
+              paddingBottom: "0.5rem",
+              scrollSnapType: "x mandatory",
+            }}>
+              {event.imageUrls.map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  style={{
+                    width: "min(80vw, 360px)",
+                    height: "min(80vw, 360px)",
+                    objectFit: "cover",
+                    borderRadius: "22px",
+                    flexShrink: 0,
+                    scrollSnapAlign: "start",
+                    boxShadow: "0 10px 28px rgba(0,0,0,0.12)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -173,6 +268,15 @@ function TemplateDetail({ event }: { event: Event }) {
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { event, loading } = useEvent(id!);
+
+  // 詳細ページは theme.bg を画面全幅で見せたいので #root の max-width を解除する
+  useEffect(() => {
+    const root = document.getElementById("root");
+    if (!root) return;
+    const prev = root.style.maxWidth;
+    root.style.maxWidth = "100%";
+    return () => { root.style.maxWidth = prev; };
+  }, []);
 
   if (loading) return <p style={{ padding: "2rem" }}>読み込み中...</p>;
   if (!event) return <p style={{ padding: "2rem" }}>イベントが見つかりません</p>;
