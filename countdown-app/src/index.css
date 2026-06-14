@@ -43,3 +43,18 @@ input::placeholder,
 textarea::placeholder {
   color: #c8c8c8;
 }
+
+/* イベント作成・編集フォーム
+   スマホはほぼ全幅、広い画面では画面の8割（最大960px）で中央寄せ。 */
+.event-form {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+@media (min-width: 768px) {
+  .event-form {
+    width: 80%;
+  }
+}
