@@ -158,7 +158,7 @@ export default function EventFormPage() {
         <div style={{ width: "1.3rem" }} />
       </header>
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "540px", margin: "0 auto", padding: "2rem 1.5rem 3rem" }}>
+      <form onSubmit={handleSubmit} className="event-form">
         <FormField label="タイトル *">
           <input style={inputStyle} value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="誕生日" />
         </FormField>
