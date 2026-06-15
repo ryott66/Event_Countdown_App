@@ -112,8 +112,8 @@ function TemplateDetail({ event }: { event: Event }) {
         flexDirection: "column",
         ...heroBgStyle,
       }}>
-        {/* ヘッダー */}
-        <div style={{ maxWidth: "720px", width: "100%", margin: "0 auto", padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* ヘッダー: 戻る←を左上、編集を右上の画面端に寄せる */}
+        <div style={{ width: "100%", padding: "1.25rem 1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <button onClick={() => navigate("/")} style={{ ...glassButtonStyle, fontSize: "1.1rem", borderRadius: "50%", width: "2.4rem", height: "2.4rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
             ←
           </button>
