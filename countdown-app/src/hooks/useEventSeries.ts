@@ -9,13 +9,18 @@ export function useEventSeries(seriesId: string | undefined | null) {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(!!seriesId);
 
+  // seriesId が変わった瞬間に同期的に state をリセットする。
+  // useEffect 内で setState すると React 19 のルール (set-state-in-effect) に違反するため、
+  // render 時に prev と比較して setState する公式パターンを採用（useEvent と同じ）。
+  const [prevSeriesId, setPrevSeriesId] = useState(seriesId);
+  if (prevSeriesId !== seriesId) {
+    setPrevSeriesId(seriesId);
+    setEvents([]);
+    setLoading(!!seriesId);
+  }
+
   useEffect(() => {
-    if (!seriesId) {
-      setEvents([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
+    if (!seriesId) return;
     const q = query(collection(db, "events"), where("seriesId", "==", seriesId));
     const unsubscribe = onSnapshot(
       q,
