@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import SeriesArchive from "../components/SeriesArchive";
 import EventGallery from "../components/EventGallery";
 import Collapsible from "../components/Collapsible";
+import BirthdayClimax from "../components/BirthdayClimax";
 import type { Event } from "../types";
 
 // ========================================
@@ -33,6 +34,11 @@ export interface BirthdayCustomData {
   trip?: { heading?: string; title?: string; dates?: string; message?: string };
   // フッターの一言。無ければ非表示。
   footerMessage?: string;
+  // クライマックス演出「このサイトについて」カードの見出し・本文（未指定なら既定文）
+  aboutTitle?: string;
+  aboutMessage?: string;
+  // Happy Birthday 画面で開封できるプレゼント
+  gifts?: { emoji?: string; title: string; detail?: string }[];
 }
 
 const BASE = import.meta.env.BASE_URL;
@@ -86,6 +92,22 @@ export default function BirthdayTemplate({ event }: Props) {
   // admin 用: 日付に関係なく当日（お祝い）表示をプレビューする
   const [previewToday, setPreviewToday] = useState(false);
   const showCelebration = isToday || previewToday;
+
+  // クライマックス演出オーバーレイの開閉
+  const [climaxOpen, setClimaxOpen] = useState(false);
+  // 当日の初回オープン判定（localStorage）。effect 内 setState を避けるため render 時に一度だけ判定する。
+  const [autoChecked, setAutoChecked] = useState(false);
+  const climaxKey = `birthday-climax-seen:${event.id}:${event.date}`;
+  if (!autoChecked && isToday) {
+    setAutoChecked(true);
+    let seen = false;
+    try { seen = localStorage.getItem(climaxKey) === "1"; } catch { /* localStorage 不可環境 */ }
+    if (!seen) setClimaxOpen(true);
+  }
+  const closeClimax = () => {
+    setClimaxOpen(false);
+    try { localStorage.setItem(climaxKey, "1"); } catch { /* localStorage 不可環境 */ }
+  };
 
   // ===== 年差分データの取り出し（無い場合は安全にフォールバック）=====
   const data = (event.customData ?? {}) as BirthdayCustomData;
@@ -538,6 +560,45 @@ export default function BirthdayTemplate({ event }: Props) {
         {footerMessage && <div className="b26-footer-right">{footerMessage}</div>}
         <p className="b26-footer-end">Created by Ryo</p>
       </footer>
+
+      {/* 当日のみ: 演出を「もう一度見る」再生ボタン */}
+      {showCelebration && !climaxOpen && (
+        <button
+          type="button"
+          onClick={() => setClimaxOpen(true)}
+          style={{
+            position: "fixed",
+            left: "1rem",
+            bottom: "1rem",
+            zIndex: 50,
+            padding: "0.55rem 1.1rem",
+            borderRadius: "999px",
+            border: "none",
+            background: "#e68ab6",
+            color: "#fff",
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            boxShadow: "0 4px 14px rgba(0,0,0,0.22)",
+            cursor: "pointer",
+          }}
+        >
+          🎬 もう一度見る
+        </button>
+      )}
+
+      {/* クライマックス演出オーバーレイ */}
+      {climaxOpen && (
+        <BirthdayClimax
+          name={name}
+          age={age}
+          imageUrls={event.imageUrls ?? []}
+          accent="#e68ab6"
+          gifts={data.gifts}
+          aboutTitle={data.aboutTitle}
+          aboutMessage={data.aboutMessage}
+          onClose={closeClimax}
+        />
+      )}
 
       {/* 動作確認用: 当日（お祝い）表示プレビュー切替。開発時のみ表示され、本番ビルドには含まれない */}
       {import.meta.env.DEV && (
