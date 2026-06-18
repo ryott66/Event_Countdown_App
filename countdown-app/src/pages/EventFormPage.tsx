@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
-import { createEvent, updateEvent, deleteEvent, uploadImage } from "../lib/eventService";
+import { createEvent, updateEvent, deleteEvent, duplicateEvent, uploadImage } from "../lib/eventService";
 import { THEMES, THEME_KEYS, type ThemeKey } from "../constants/themes";
 
 const EMOJI_PRESETS = ["🎂", "✈️", "🥂", "🍽️", "🎉", "🌸", "💍", "🎁", "🌊", "🏔️", "🎵", "❤️"];
@@ -45,6 +45,7 @@ export default function EventFormPage() {
   const [emoji, setEmoji] = useState("🎉");
   const [theme, setTheme] = useState<ThemeKey>("birthday");
   const [memo, setMemo] = useState("");
+  const [seriesId, setSeriesId] = useState("");
   const [iconUrl, setIconUrl] = useState("");
   const [heroImageUrl, setHeroImageUrl] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -52,6 +53,7 @@ export default function EventFormPage() {
   const [heroUploading, setHeroUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
   const [iconHover, setIconHover] = useState(false);
   const [heroHover, setHeroHover] = useState(false);
 
@@ -66,6 +68,7 @@ export default function EventFormPage() {
     setEmoji(event.emoji);
     setTheme(event.theme);
     setMemo(event.memo ?? "");
+    setSeriesId(event.seriesId ?? "");
     setIconUrl(event.iconUrl ?? "");
     setHeroImageUrl(event.heroImageUrl ?? "");
     setImageUrls(event.imageUrls ?? []);
@@ -118,6 +121,7 @@ export default function EventFormPage() {
     setSaving(true);
     const input = {
       title, date, emoji, theme, memo, iconUrl, heroImageUrl, imageUrls,
+      seriesId: seriesId.trim() || undefined,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
       createdBy: user.uid ?? "",
@@ -138,6 +142,20 @@ export default function EventFormPage() {
     if (!confirm("このイベントを削除しますか？")) return;
     await deleteEvent(id!);
     navigate("/");
+  };
+
+  const handleDuplicate = async () => {
+    if (!event) return;
+    if (!confirm("このイベントを複製して翌年の新規イベントを作成しますか？（日付は翌年・写真は引き継がれません）")) return;
+    setDuplicating(true);
+    try {
+      // 保存前でも、入力中のシリーズIDを翌年イベントへ引き継ぐ
+      const source = { ...event, seriesId: seriesId.trim() || undefined };
+      const ref = await duplicateEvent(source, user.uid ?? "");
+      navigate(`/events/${ref.id}/edit`);
+    } finally {
+      setDuplicating(false);
+    }
   };
 
   return (
@@ -402,6 +420,18 @@ export default function EventFormPage() {
           )}
         </FormField>
 
+        <FormField label="シリーズID（任意・年次イベントの関連付け）">
+          <input
+            style={inputStyle}
+            value={seriesId}
+            onChange={(e) => setSeriesId(e.target.value)}
+            placeholder="例: remina-birthday"
+          />
+          <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.35rem" }}>
+            同じIDを付けたイベント同士が、詳細ページの「Memories」で相互に辿れるようになります。下の「複製して新規作成」では、ここで入力したIDがそのまま翌年イベントへ引き継がれます。
+          </p>
+        </FormField>
+
         <button
           type="submit" disabled={saving || galleryUploading || iconUploading || heroUploading}
           style={{
@@ -413,6 +443,21 @@ export default function EventFormPage() {
         >
           {saving ? "保存中..." : isEdit ? "Save" : "Create"}
         </button>
+
+        {isEdit && (
+          <button
+            type="button" onClick={handleDuplicate} disabled={duplicating}
+            style={{
+              width: "100%", marginTop: "1rem", padding: "0.75rem",
+              borderRadius: "12px", background: "none",
+              color: "var(--pink)", fontSize: "0.85rem",
+              border: "1.5px solid var(--pink)",
+              opacity: duplicating ? 0.7 : 1,
+            }}
+          >
+            {duplicating ? "複製中..." : "複製して新規作成（翌年）"}
+          </button>
+        )}
 
         {isEdit && (
           <button

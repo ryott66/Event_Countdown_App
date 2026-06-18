@@ -20,6 +20,10 @@ export interface Event {
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
+  // 年に一度などの繰り返しイベントを関連付けるためのシリーズ識別子（例: "remina-birthday"）
+  seriesId?: string;
+  // カスタムページが解釈する年差分などの自由形式データ。各カスタムページが自分の型として読む。
+  customData?: Record<string, unknown>;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

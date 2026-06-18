@@ -7,6 +7,8 @@ import { customPageRegistry } from "../custom-pages";
 import { THEMES } from "../constants/themes";
 import { getCurrentSeason } from "../constants/seasonal";
 import SeasonalDecoration from "../components/SeasonalDecoration";
+import SeriesArchive from "../components/SeriesArchive";
+import EventGallery from "../components/EventGallery";
 import type { Event } from "../types";
 
 function useCountdown(dateStr: string) {
@@ -207,90 +209,56 @@ function TemplateDetail({ event }: { event: Event }) {
         </div>
       </section>
 
-      {/* 下のセクション: メモ / 画像ギャラリー */}
-      {(event.memo || event.imageUrls?.length > 0) && (
-        <div style={{ padding: "2rem 0 3rem" }}>
-          {event.memo && (
+      {/* メモ（お手紙カード） */}
+      {event.memo && (
+        <div style={{ padding: "2rem 0 0" }}>
+          <div style={{
+            maxWidth: "560px",
+            margin: "0 auto",
+            padding: "0 1.5rem",
+          }}>
             <div style={{
-              maxWidth: "560px",
-              margin: "0 auto",
-              padding: "0 1.5rem",
+              position: "relative",
+              background: "linear-gradient(180deg, #fffbf5 0%, #fff5ee 100%)",
+              borderRadius: "18px",
+              padding: "2rem 1.75rem 1.75rem",
+              border: `1.5px dashed ${theme.accent}`,
+              boxShadow: "0 6px 22px rgba(0,0,0,0.08)",
+              color: "var(--text)",
+              lineHeight: 1.9,
+              whiteSpace: "pre-wrap",
+              fontSize: "1rem",
+              textAlign: "center",
+              letterSpacing: "0.02em",
             }}>
               <div style={{
-                position: "relative",
-                background: "linear-gradient(180deg, #fffbf5 0%, #fff5ee 100%)",
-                borderRadius: "18px",
-                padding: "2rem 1.75rem 1.75rem",
-                border: `1.5px dashed ${theme.accent}`,
-                boxShadow: "0 6px 22px rgba(0,0,0,0.08)",
-                color: "var(--text)",
-                lineHeight: 1.9,
-                whiteSpace: "pre-wrap",
-                fontSize: "1rem",
-                textAlign: "center",
-                letterSpacing: "0.02em",
-              }}>
-                <div style={{
-                  position: "absolute",
-                  top: "-0.95rem",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  background: theme.accent,
-                  color: "#fff",
-                  width: "1.9rem",
-                  height: "1.9rem",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.95rem",
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
-                  border: "2px solid #fffbf5",
-                }}>♡</div>
-                {event.memo}
-              </div>
-            </div>
-          )}
-
-          {event.imageUrls?.length > 0 && (
-            <div style={{
-              marginTop: event.memo ? "1.5rem" : 0,
-              background: `linear-gradient(90deg, ${theme.accent} 0%, #fff9e6 50%, ${theme.accent} 100%)`,
-              border: "0.35rem solid #c9c9c9",
-              borderLeft: "none",
-              borderRight: "none",
-              padding: "0.6rem 0.4rem 1.2rem",
-            }}>
-              <div style={{
+                position: "absolute",
+                top: "-0.95rem",
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: theme.accent,
+                color: "#fff",
+                width: "1.9rem",
+                height: "1.9rem",
+                borderRadius: "50%",
                 display: "flex",
-                overflowX: "auto",
-                scrollSnapType: "x mandatory",
-                gap: "0.6rem",
-                padding: "0.8rem 0.5rem 0.5rem",
-              }}>
-                {event.imageUrls.map((url, i) => (
-                  <img
-                    key={i}
-                    src={url}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    style={{
-                      height: "clamp(15rem, 55vw, 24rem)",
-                      border: "0.15rem solid rgb(128,128,128)",
-                      borderRadius: "0.6rem",
-                      objectFit: "cover",
-                      display: "block",
-                      scrollSnapAlign: "start",
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </div>
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.95rem",
+                boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
+                border: "2px solid #fffbf5",
+              }}>♡</div>
+              {event.memo}
             </div>
-          )}
+          </div>
         </div>
       )}
+
+      {/* 追加画像ギャラリー（現在 + 同シリーズの過去年を統合） */}
+      <EventGallery event={event} accent={theme.accent} />
+
+      <div style={{ paddingBottom: "1rem" }} />
+      <SeriesArchive event={event} accent={theme.accent} />
     </div>
   );
 }
