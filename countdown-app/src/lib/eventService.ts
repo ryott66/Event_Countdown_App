@@ -7,6 +7,7 @@ import { db, storage } from "./firebase";
 import { compressImage, type ImageProfile } from "./imageCompression";
 import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import type { ThemeKey } from "../constants/themes";
+import type { Event } from "../types";
 
 export interface EventInput {
   title: string;
@@ -19,6 +20,8 @@ export interface EventInput {
   imageUrls: string[];
   useCustomPage: boolean;
   customPageKey: string;
+  seriesId?: string;
+  customData?: Record<string, unknown>;
   createdBy: string;
 }
 
@@ -47,9 +50,16 @@ export async function deleteImage(url: string): Promise<void> {
   await deleteObject(storageRef);
 }
 
+// Firestore は undefined を受け付けないため、未定義フィールドを取り除く
+function stripUndefined<T extends object>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, v]) => v !== undefined),
+  ) as Partial<T>;
+}
+
 export async function createEvent(input: EventInput) {
   return addDoc(collection(db, "events"), {
-    ...input,
+    ...stripUndefined(input),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -57,13 +67,43 @@ export async function createEvent(input: EventInput) {
 
 export async function updateEvent(id: string, input: Partial<EventInput>) {
   await updateDoc(doc(db, "events", id), {
-    ...input,
+    ...stripUndefined(input),
     updatedAt: serverTimestamp(),
   });
 }
 
 export async function deleteEvent(id: string) {
   await deleteDoc(doc(db, "events", id));
+}
+
+// "YYYY-MM-DD" の年を1つ繰り上げる
+function bumpYear(dateStr: string): string {
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+  parts[0] = String(Number(parts[0]) + 1);
+  return parts.join("-");
+}
+
+// 既存イベントを複製して翌年の新規イベントを作る。
+// customPageKey / seriesId / customData / theme などは引き継ぎ、
+// 日付は翌年へ、写真(imageUrls)はクリアする。
+export async function duplicateEvent(source: Event, createdBy: string) {
+  const input: EventInput = {
+    title: source.title,
+    date: bumpYear(source.date),
+    emoji: source.emoji,
+    theme: source.theme,
+    memo: source.memo ?? "",
+    iconUrl: source.iconUrl ?? "",
+    heroImageUrl: source.heroImageUrl,
+    imageUrls: [],
+    useCustomPage: source.useCustomPage,
+    customPageKey: source.customPageKey,
+    seriesId: source.seriesId,
+    customData: source.customData,
+    createdBy,
+  };
+  return createEvent(input);
 }
 
 export async function addToGallery(gallery: GalleryKey, urls: string[]): Promise<void> {

@@ -7,5 +7,8 @@ export const customPageRegistry: Record<
   string,
   LazyExoticComponent<ComponentType<{ event: Event }>>
 > = {
+  // 年非依存の汎用テンプレ。新しい年のイベントはこのキーを使う。
+  "birthday": lazy(() => import("./birthday")),
+  // 旧キーの後方互換。2026ドキュメントを "birthday" + customData へ移行したら削除可。
   "birthday-2026": lazy(() => import("./birthday-2026")),
 };
