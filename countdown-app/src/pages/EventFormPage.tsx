@@ -129,10 +129,11 @@ export default function EventFormPage() {
     try {
       if (isEdit) {
         await updateEvent(id!, input);
+        navigate(`/events/${id}`);
       } else {
-        await createEvent(input);
+        const ref = await createEvent(input);
+        navigate(`/events/${ref.id}`);
       }
-      navigate("/");
     } finally {
       setSaving(false);
     }
