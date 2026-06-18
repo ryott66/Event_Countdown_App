@@ -31,6 +31,18 @@ const LEGACY_2026: BirthdayCustomData = {
   ],
   trip: { heading: "2025", title: "Karuizawa", dates: "6/26~6/27", message: "Thank you" },
   footerMessage: "大好きなれみちゃん、いつもありがとう😄",
+  // クライマックス演出（2026固有）
+  aboutMessage:
+    "玲実奈、お誕生日おめでとう！\n" +
+    "これは大切な日をカウントダウンするアプリだよ。スマホのホーム画面に追加して一緒に使いたいな🥰\n" +
+    "イベントごとに写真やメッセージを残せて、思い出と、これからの楽しいことが少しずつ積み重なっていくよ。\n" +
+    "これからもよろしくね。大好きだよ。",
+  gifts: [
+    { title: "Dinner", emoji: "🚢🏨" },
+    { title: "Trip", emoji: "🚆" },
+    { title: "Present", emoji: "👧🏻✨" },
+    { title: "Coupon", emoji: "🍰🍬🍲" },
+  ],
 };
 
 export default function Birthday2026({ event }: { event: Event }) {
