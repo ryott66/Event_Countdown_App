@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, Marker, Popup, ZoomControl, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -118,16 +118,32 @@ function PrefectureSheet({
   events,
   today,
   onClose,
+  onHeightChange,
 }: {
   pref: PrefectureSelection;
   events: Event[];
   today: string;
   onClose: () => void;
+  // シートの実高さを親へ通知する（🗾ボタンをシートの上に退避させるため）
+  onHeightChange: (height: number) => void;
 }) {
   const navigate = useNavigate();
 
+  // 件数や画面幅で高さが変わるため ResizeObserver で監視する
+  const sheetRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sheetRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => onHeightChange(el.offsetHeight));
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      onHeightChange(0); // シートが閉じたら元の位置に戻す
+    };
+  }, [onHeightChange]);
+
   return (
-    <div style={{
+    <div ref={sheetRef} style={{
       position: "absolute", left: "50%", bottom: 0, transform: "translateX(-50%)",
       zIndex: 1000,
       width: "min(560px, 100%)",
@@ -220,6 +236,9 @@ export default function MapViewPage() {
   const [selectedPref, setSelectedPref] = useState<PrefectureSelection | null>(null);
   // 地図の主目的は思い出（過去イベント）。これからのイベントはトグルで表示する
   const [showUpcoming, setShowUpcoming] = useState(false);
+  // ボトムシートの実高さ。開いている間は 🗾 ボタンをシートの上へ退避させる
+  const [sheetHeight, setSheetHeight] = useState(0);
+  const handleSheetHeight = useCallback((h: number) => setSheetHeight(h), []);
 
   // 地図を画面全幅で見せたいので #root の max-width を解除する（詳細ページと同じパターン）
   useEffect(() => {
@@ -274,6 +293,12 @@ export default function MapViewPage() {
           onOverview={() => setSelectedPref(null)}
           // ボトムシートと重ならないように、県へのズームは下側に余白を取る
           flyPaddingBottom={220}
+          // スマホで親指が届きやすい右下（ズームボタンの上）に置く。
+          // ボトムシートが開いている間は、その高さぶん上へ退避させる
+          overviewButtonPosition={{
+            bottom: sheetHeight > 0 ? `${sheetHeight + 12}px` : "8rem",
+            right: "0.75rem",
+          }}
         />
         <FitToPins points={points} />
         {visible.map((e) => <EventPin key={e.id} event={e} isUpcoming={e.date >= today} />)}
@@ -352,6 +377,7 @@ export default function MapViewPage() {
           events={prefEvents}
           today={today}
           onClose={() => setSelectedPref(null)}
+          onHeightChange={handleSheetHeight}
         />
       )}
 
