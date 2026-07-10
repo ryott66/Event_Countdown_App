@@ -552,6 +552,7 @@ export default function HomePage() {
         </div>
         <button className="hp-nav-btn" onClick={() => scrollTo("hp-events")}>Events</button>
         <button className="hp-nav-btn" onClick={() => scrollTo("hp-galleries")}>Memories</button>
+        <button className="hp-nav-btn" onClick={() => navigate("/map")}>Map</button>
         {isAdmin && (
           <>
             <button className="hp-icon-btn" onClick={() => navigate("/events/new")}>+</button>

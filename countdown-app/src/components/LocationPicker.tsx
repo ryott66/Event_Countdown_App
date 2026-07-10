@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { emojiIcon, EMOJI_PIN_CSS, TILE_URL, TILE_ATTRIBUTION } from "../lib/mapIcon";
+import { emojiIcon, MAP_CSS } from "../lib/mapIcon";
+import MapAutoResize from "./MapAutoResize";
+import MapBaseLayer from "./MapBaseLayer";
 
 // 日本全体が収まる初期表示（ピン未設置時）
 const JAPAN_CENTER: [number, number] = [36.5, 138.0];
@@ -66,11 +68,13 @@ function FlyTo({ target }: { target: Pin | null }) {
 export default function LocationPicker({
   pin,
   emoji,
+  iconUrl,
   onPick,
   onSearchSelect,
 }: {
   pin: Pin | null;
   emoji: string;
+  iconUrl?: string;
   onPick: (lat: number, lng: number) => void;
   onSearchSelect?: (name: string) => void;
 }) {
@@ -109,7 +113,7 @@ export default function LocationPicker({
 
   return (
     <div>
-      <style>{EMOJI_PIN_CSS}</style>
+      <style>{MAP_CSS}</style>
 
       {/* 検索ボックス */}
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -202,20 +206,24 @@ export default function LocationPicker({
         style={{
           width: "100%",
           height: "260px",
-          borderRadius: "14px",
+          borderRadius: "18px",
           overflow: "hidden",
-          border: "1.5px solid #f0d0e0",
+          border: "2px solid #f6cfe2",
+          boxShadow: "0 6px 20px rgba(214, 104, 158, 0.15)",
         }}
       >
         <MapContainer
           center={center}
           zoom={zoom}
           style={{ width: "100%", height: "100%" }}
+          // 県クリック時の着地ズームを細かく調整できるよう fractional zoom を許可
+          zoomSnap={0.25}
         >
-          <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} subdomains="abcd" />
+          <MapBaseLayer />
+          <MapAutoResize />
           <ClickHandler onPick={onPick} />
           <FlyTo target={flyTarget} />
-          {pin && <Marker position={[pin.lat, pin.lng]} icon={emojiIcon(emoji)} />}
+          {pin && <Marker position={[pin.lat, pin.lng]} icon={emojiIcon(emoji, iconUrl)} />}
         </MapContainer>
       </div>
       <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "0.35rem" }}>

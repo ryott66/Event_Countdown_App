@@ -408,6 +408,7 @@ export default function EventFormPage() {
             <LocationPicker
               pin={locationPin}
               emoji={emoji}
+              iconUrl={iconUrl || undefined}
               onPick={(lat, lng) => setLocationPin({ lat, lng })}
               onSearchSelect={(name) => setLocationName(name)}
             />
