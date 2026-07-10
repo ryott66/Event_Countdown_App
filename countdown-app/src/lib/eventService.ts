@@ -7,7 +7,7 @@ import { db, storage } from "./firebase";
 import { compressImage, type ImageProfile } from "./imageCompression";
 import { GALLERIES, type GalleryKey } from "../constants/galleries";
 import type { ThemeKey } from "../constants/themes";
-import type { Event } from "../types";
+import type { Event, EventLocation } from "../types";
 
 export interface EventInput {
   title: string;
@@ -22,6 +22,7 @@ export interface EventInput {
   customPageKey: string;
   seriesId?: string;
   customData?: Record<string, unknown>;
+  location?: EventLocation;
   createdBy: string;
 }
 
@@ -101,6 +102,7 @@ export async function duplicateEvent(source: Event, createdBy: string) {
     customPageKey: source.customPageKey,
     seriesId: source.seriesId,
     customData: source.customData,
+    location: source.location,
     createdBy,
   };
   return createEvent(input);
