@@ -89,6 +89,7 @@ export default function MapBaseLayer({
   onPrefectureSelect,
   onOverview,
   flyPaddingBottom = 24,
+  overviewButtonPosition = { top: "1rem", right: "1rem" },
 }: {
   // 都道府県クリック時に呼ばれる（地図ビューのイベントリスト表示用）
   onPrefectureSelect?: (pref: PrefectureSelection) => void;
@@ -96,6 +97,8 @@ export default function MapBaseLayer({
   onOverview?: () => void;
   // 県へズームインするときの下側余白（ボトムシートと重ならないように）
   flyPaddingBottom?: number;
+  // 🗾 ボタンの配置（ページごとの UI と重ならない場所を親が指定する）
+  overviewButtonPosition?: React.CSSProperties;
 }) {
   const map = useMap();
   // GeoJSON レイヤーの onEachFeature はレイヤー生成時の一度しか走らないため、
@@ -226,7 +229,8 @@ export default function MapBaseLayer({
       {mode === "detail" && (
         <div
           ref={buttonWrapRef}
-          style={{ position: "absolute", top: "1rem", right: "1rem", zIndex: 1000 }}
+          // ボトムシートの開閉に合わせて位置が変わるので、ふわっと追従させる
+          style={{ position: "absolute", zIndex: 1000, transition: "top 0.25s ease, bottom 0.25s ease", ...overviewButtonPosition }}
         >
           {/* アイコンのみの丸ボタン（スマホでタイトルと重ならないように） */}
           <button
@@ -235,13 +239,13 @@ export default function MapBaseLayer({
             aria-label="全体マップへ戻る"
             title="全体マップへ戻る"
             style={{
-              width: "2.7rem", height: "2.7rem",
+              width: "3.2rem", height: "3.2rem",
               display: "flex", alignItems: "center", justifyContent: "center",
               borderRadius: "50%",
               background: "linear-gradient(160deg, #ffffff, #fff0f7)",
               border: "1.5px solid #f6cfe2",
               boxShadow: "0 6px 18px rgba(214, 104, 158, 0.28)",
-              fontSize: "1.25rem", lineHeight: 1,
+              fontSize: "1.55rem", lineHeight: 1,
               cursor: "pointer",
             }}
           >
