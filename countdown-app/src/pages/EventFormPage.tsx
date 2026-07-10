@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import { deleteField } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useEvent } from "../hooks/useEvent";
 import { createEvent, updateEvent, deleteEvent, duplicateEvent, uploadImage } from "../lib/eventService";
 import { THEMES, THEME_KEYS, type ThemeKey } from "../constants/themes";
+import LocationPicker from "../components/LocationPicker";
 
 const EMOJI_PRESETS = ["🎂", "✈️", "🥂", "🍽️", "🎉", "🌸", "💍", "🎁", "🌊", "🏔️", "🎵", "❤️"];
 
@@ -49,6 +51,8 @@ export default function EventFormPage() {
   const [iconUrl, setIconUrl] = useState("");
   const [heroImageUrl, setHeroImageUrl] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [locationName, setLocationName] = useState("");
+  const [locationPin, setLocationPin] = useState<{ lat: number; lng: number } | null>(null);
   const [iconUploading, setIconUploading] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
@@ -72,6 +76,8 @@ export default function EventFormPage() {
     setIconUrl(event.iconUrl ?? "");
     setHeroImageUrl(event.heroImageUrl ?? "");
     setImageUrls(event.imageUrls ?? []);
+    setLocationName(event.location?.name ?? "");
+    setLocationPin(event.location ? { lat: event.location.lat, lng: event.location.lng } : null);
   }
 
   useEffect(() => {
@@ -122,13 +128,22 @@ export default function EventFormPage() {
     const input = {
       title, date, emoji, theme, memo, iconUrl, heroImageUrl, imageUrls,
       seriesId: seriesId.trim() || undefined,
+      location: locationPin
+        ? { name: locationName.trim(), lat: locationPin.lat, lng: locationPin.lng }
+        : undefined,
       useCustomPage: isEdit ? (event?.useCustomPage ?? false) : false,
       customPageKey: isEdit ? (event?.customPageKey ?? "") : "",
       createdBy: user.uid ?? "",
     };
     try {
       if (isEdit) {
-        await updateEvent(id!, input);
+        // 既存の場所をクリアした場合は deleteField で明示的に削除する
+        // （undefined は stripUndefined で除去され、更新に含まれないため残ってしまう）
+        const updatePayload =
+          !locationPin && event?.location
+            ? { ...input, location: deleteField() as unknown as undefined }
+            : input;
+        await updateEvent(id!, updatePayload);
         navigate(`/events/${id}`);
       } else {
         const ref = await createEvent(input);
@@ -380,6 +395,38 @@ export default function EventFormPage() {
             onChange={(e) => setMemo(e.target.value)}
             placeholder="一言メモ..."
           />
+        </FormField>
+
+        <FormField label="場所（任意）">
+          <input
+            style={inputStyle}
+            value={locationName}
+            onChange={(e) => setLocationName(e.target.value)}
+            placeholder="場所名（例: 日光東照宮）"
+          />
+          <div style={{ marginTop: "0.6rem" }}>
+            <LocationPicker
+              pin={locationPin}
+              emoji={emoji}
+              onPick={(lat, lng) => setLocationPin({ lat, lng })}
+              onSearchSelect={(name) => setLocationName(name)}
+            />
+          </div>
+          {locationPin && (
+            <button
+              type="button"
+              onClick={() => { if (confirm("場所を削除しますか？")) { setLocationPin(null); setLocationName(""); } }}
+              style={{
+                marginTop: "0.5rem", width: "100%",
+                padding: "0.4rem 0", fontSize: "0.8rem",
+                color: "#e05", background: "none",
+                border: "1px solid #e05", borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              場所を削除
+            </button>
+          )}
         </FormField>
 
         <FormField label="追加画像">

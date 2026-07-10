@@ -254,6 +254,38 @@ function TemplateDetail({ event }: { event: Event }) {
         </div>
       )}
 
+      {/* 場所（Google マップへのリンク） */}
+      {event.location && (
+        <div style={{ padding: "2rem 0 0" }}>
+          <div style={{ maxWidth: "560px", margin: "0 auto", padding: "0 1.5rem" }}>
+            <a
+              href={`https://www.google.com/maps?q=${event.location.lat},${event.location.lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                padding: "0.9rem 1.2rem",
+                background: "rgba(255,255,255,0.55)",
+                borderRadius: "16px",
+                border: `1.5px solid ${theme.accent}`,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
+                color: theme.accent,
+                textDecoration: "none",
+                fontSize: "1rem",
+                letterSpacing: "0.02em",
+              }}
+            >
+              <span style={{ fontSize: "1.3rem", lineHeight: 1 }}>📍</span>
+              <span style={{ minWidth: 0, wordBreak: "break-word" }}>
+                {event.location.name || "地図で見る"}
+              </span>
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* 追加画像ギャラリー（現在 + 同シリーズの過去年を統合） */}
       <EventGallery event={event} accent={theme.accent} />
 

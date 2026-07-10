@@ -8,6 +8,12 @@ export interface AppUser {
   email?: string;
 }
 
+export interface EventLocation {
+  name: string; // 表示名（例: "日光東照宮"）
+  lat: number;
+  lng: number;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -24,6 +30,8 @@ export interface Event {
   seriesId?: string;
   // カスタムページが解釈する年差分などの自由形式データ。各カスタムページが自分の型として読む。
   customData?: Record<string, unknown>;
+  // イベントの場所（地図ピン）。未設定のイベントもあるため optional。
+  location?: EventLocation;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
